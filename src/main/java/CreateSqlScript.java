@@ -9,10 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CreateSqlScript {
-    public void createFiles() throws IOException {
+
+    private static final String JSON_DIR_PATH = "model_infos";
+
+    public void createFiles() {
         createTables();
         insertData();
     }
+
     public void createTables() {
         String sqlScript =
                 "-- Model Table\n" +
@@ -133,23 +137,23 @@ public class CreateSqlScript {
         }
     }
 
-    public void insertData() throws IOException {
+    public void insertData() {
         ObjectMapper mapper = new ObjectMapper();
-        Path dirPath = Paths.get("model_infos"); // specify your directory path inside the get method
+        Path dirPath = Paths.get(JSON_DIR_PATH); // specify your directory path inside the get method
 
         try {
             Files.newDirectoryStream(dirPath).forEach(filePath -> {
                 if (Files.isRegularFile(filePath)) {
-                    System.out.println(filePath);
-                    Models models = null;
+                    Models models;
                     try {
                         models = mapper.readValue(filePath.toFile(), Models.class);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    System.out.println(models.getModels().get(0).getMlTask());
+                    String mltask = models.getModels().get(0).getMlTask();
                     String sqlScript = buildInsertSQL(models);
-                    writeToFile(String.format("insert_models_%s.sql",models.getModels().get(0).getMlTask()), sqlScript);
+                    writeToFile(String.format("insert_models_%s.sql", mltask), sqlScript);
+                    System.out.println(mltask + " sql file created successfully!");
                 }
             });
         } catch (IOException e) {
@@ -169,36 +173,36 @@ public class CreateSqlScript {
             sb.append("INSERT INTO Model(name, mlTask) VALUES ('").append(name).append("', '").append(mlTask).append("');\n");
             sb.append("INSERT INTO Metadata(model,model_description,display_name,structure) VALUES ('").append(metadata.getModel()).append("', '").append(modelDescription).append("', '").append(metadata.getDisplayName()).append("', '").append(metadata.getStructure()).append("');\n");
             sb.append("INSERT INTO Parameters(model_id, metadata_id) VALUES ((select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'),(select id from metadata where model='").append(metadata.getModel()).append("'));\n");
-            for (String modelType: metadata.getModelType()) {
+            for (String modelType : metadata.getModelType()) {
                 sb.append("INSERT INTO ModelType(type,metadata_id) values ('").append(modelType).append("', (select id from metadata where model='").append(metadata.getModel()).append("'));\n");
             }
-            for (String advantage: metadata.getAdvantages()) {
+            for (String advantage : metadata.getAdvantages()) {
                 advantage = advantage.replace("'", "''");
                 sb.append("INSERT INTO Advantage(advantage,metadata_id) values ('").append(advantage).append("', (select id from metadata where model='").append(metadata.getModel()).append("'));\n");
             }
-            for (String disadvantage: metadata.getDisadvantages()) {
+            for (String disadvantage : metadata.getDisadvantages()) {
                 disadvantage = disadvantage.replace("'", "''");
                 sb.append("INSERT INTO Disadvantage(disadvantage,metadata_id) values ('").append(disadvantage).append("', (select id from metadata where model='").append(metadata.getModel()).append("'));\n");
             }
-            for (String prime: metadata.getPrime()) {
+            for (String prime : metadata.getPrime()) {
                 prime = prime.replace("'", "''");
                 sb.append("INSERT INTO Prime(prime,metadata_id) values ('").append(prime).append("', (select id from metadata where model='").append(metadata.getModel()).append("'));\n");
             }
             Support support = metadata.getSupports();
             sb.append("INSERT INTO Support(probabilities,feature_importances,decision_tree,metadata_id) values (").append(support.getProbabilities()).append(",").append(support.getFeatureImportances()).append(",").append(support.getDecisionTree()).append(", (select id from metadata where model='").append(metadata.getModel()).append("'));\n");
 
-            for (String incompatibleMetric: model.getIncompatibleMetrics()) {
+            for (String incompatibleMetric : model.getIncompatibleMetrics()) {
                 incompatibleMetric = incompatibleMetric.replace("'", "''");
                 sb.append("INSERT INTO IncompatibleMetrics(metric,model_id) VALUES ('").append(incompatibleMetric).append("',(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n");
             }
-            for (String group: model.getGroups()) {
+            for (String group : model.getGroups()) {
                 group = group.replace("'", "''");
                 sb.append("INSERT INTO Groups(group_item,model_id) VALUES ('").append(group).append("',(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n");
             }
-            for (InputParameter inputParameter: model.getParameters().getInputParameters()){
+            for (InputParameter inputParameter : model.getParameters().getInputParameters()) {
                 String description = inputParameter.getDescription().replace("'", "''");
                 sb.append("INSERT INTO InputParameter(parameter_name,parameter_type,min_value,max_value,default_value,label,description,enabled,has_constraint,constraint_information,fixed_value,parameters_id) VALUES ('").append(inputParameter.getParameterName()).append("','").append(inputParameter.getParameterType()).append("','").append(inputParameter.getMinValue()).append("','").append(inputParameter.getMaxValue()).append("','").append(inputParameter.getDefaultValue()).append("','").append(inputParameter.getLabel()).append("','").append(description).append("',").append(inputParameter.isEnabled()).append(",").append(inputParameter.isConstraint()).append(",'").append(inputParameter.getConstraintInformation()).append("','").append(inputParameter.isFixedValue()).append("',(select id from parameters where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("')));\n");
-                for (String value: inputParameter.getValues()) {
+                for (String value : inputParameter.getValues()) {
                     value = value.replace("'", "''");
                     sb.append("INSERT INTO InputParameterValues(value,input_parameter_id) VALUES ('").append(value).append("',(select id from InputParameter where parameter_name='").append(inputParameter.getParameterName()).append("' and parameters_id=(select id from parameters where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'))));\n");
                 }
