@@ -27,11 +27,7 @@ public class PythonInteraction {
 //            throw new IOException(p.getErrorStream().toString());
 //        }
         System.out.println("Script executed successfully");
-
-        ObjectMapper mapper = new ObjectMapper();
-        Models models = mapper.readValue(new File("model_infos/infos_classification.json"), Models.class);
-        System.out.println(models.getModels().get(0).getMlTask());
         CreateSqlScript createSqlScript = new CreateSqlScript();
-        createSqlScript.createFiles(models);
+        createSqlScript.createFiles();
     }
 }

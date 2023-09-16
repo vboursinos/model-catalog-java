@@ -1,14 +1,17 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
 import model.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class CreateSqlScript {
-    public void createFiles(Models models) {
+    public void createFiles() throws IOException {
         createTables();
-        insertData(models);
+        insertData();
     }
     public void createTables() {
         String sqlScript =
@@ -17,6 +20,15 @@ public class CreateSqlScript {
                         "    id SERIAL PRIMARY KEY,\n" +
                         "    name TEXT,\n" +
                         "    mlTask TEXT\n" +
+                        ");\n\n" +
+
+                        "-- Metadata Table\n" +
+                        "CREATE TABLE Metadata (\n" +
+                        "    id SERIAL PRIMARY KEY,\n" +
+                        "    model TEXT,\n" +
+                        "    model_description TEXT,\n" +
+                        "    display_name TEXT,\n" +
+                        "    structure TEXT\n" +
                         ");\n\n" +
 
                         "-- Parameters Table\n" +
@@ -62,15 +74,6 @@ public class CreateSqlScript {
                         "    id SERIAL PRIMARY KEY,\n" +
                         "    value TEXT,\n" +
                         "    input_parameter_id INT REFERENCES InputParameter(id)\n" +
-                        ");\n\n" +
-
-                        "-- Metadata Table\n" +
-                        "CREATE TABLE Metadata (\n" +
-                        "    id SERIAL PRIMARY KEY,\n" +
-                        "    model TEXT,\n" +
-                        "    model_description TEXT,\n" +
-                        "    display_name TEXT,\n" +
-                        "    structure TEXT\n" +
                         ");\n\n" +
 
                         "-- ModelType Table\n" +
@@ -130,9 +133,29 @@ public class CreateSqlScript {
         }
     }
 
-    public void insertData(Models models){
-        String sqlScript = buildInsertSQL(models);
-        writeToFile("insert_models.sql", sqlScript);
+    public void insertData() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Path dirPath = Paths.get("model_infos"); // specify your directory path inside the get method
+
+        try {
+            Files.newDirectoryStream(dirPath).forEach(filePath -> {
+                if (Files.isRegularFile(filePath)) {
+                    System.out.println(filePath);
+                    Models models = null;
+                    try {
+                        models = mapper.readValue(filePath.toFile(), Models.class);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println(models.getModels().get(0).getMlTask());
+                    String sqlScript = buildInsertSQL(models);
+                    writeToFile(String.format("insert_models_%s.sql",models.getModels().get(0).getMlTask()), sqlScript);
+                }
+            });
+        } catch (IOException e) {
+            System.err.println("Error reading files from directory: " + e.getMessage());
+        }
+
     }
 
     static String buildInsertSQL(Models models) {
