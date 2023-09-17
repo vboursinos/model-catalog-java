@@ -1,5 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import utils.FileUtils;
 
 import java.io.BufferedWriter;
@@ -10,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CreateSqlScript {
+//todo add to db blacklist information (in each model we can have a boolena filed if this model is blacklisted or not) If it is blacklisted we don't show it in the UI
+    private static final Logger logger = LogManager.getLogger(CreateSqlScript.class);
 
     private static final String JSON_DIR_PATH = "model_infos";
     private static final String SQL_DIR_PATH = "sql_scripts";
@@ -164,11 +168,11 @@ public class CreateSqlScript {
                     String fileName = String.format("insert_models_%s.sql", mltask);
                     writeToFile(sqlFilesPath.resolve(fileName).toString(), sqlScript);
 
-                    System.out.println(mltask + " sql file created successfully!");
+                    logger.info(mltask + " sql file created successfully!");
                 }
             });
         } catch (IOException e) {
-            System.err.println("Error reading files from directory: " + e.getMessage());
+            logger.error("Error reading files from directory: " + e.getMessage());
         }
 
     }
