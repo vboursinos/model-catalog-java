@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 public class PythonInteraction {
     public static void main(String[] args) throws IOException, InterruptedException {
-        String script = "/home/vasilis/PycharmProjects/model-catalog-py/src/main.py";
+        String script = "model-catalog-py/src/main.py";
         ProcessBuilder pb;
         Process p;
         pb =

@@ -176,7 +176,7 @@ public class CreateSqlScript {
     static String buildInsertSQL(Models models) {
         StringBuilder sb = new StringBuilder();
         for (Model model : models.getModels()) {
-            String name = model.getName().replace("'", "''");  // escape single quote
+            String name = model.getName().replace("'", "''");
             String mlTask = model.getMlTask().replace("'", "''");
             Metadata metadata = model.getParameters().getMetadata();
             String modelDescription = metadata.getModelDescription().replace("'", "''");
