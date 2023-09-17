@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.*;
+import utils.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,13 +12,20 @@ import java.nio.file.Paths;
 public class CreateSqlScript {
 
     private static final String JSON_DIR_PATH = "model_infos";
+    private static final String SQL_DIR_PATH = "sql_scripts";
 
-    public void createFiles() {
-        createTables();
-        insertData();
+    private static final String SETUP_SCRIPT_NAME = "setup.sql";
+
+    public CreateSqlScript() {
+        FileUtils.createDirectory(Paths.get(SQL_DIR_PATH));
     }
 
-    public void createTables() {
+    public void createFiles() {
+        createTablesScript();
+        insertDataScripts();
+    }
+
+    public void createTablesScript() {
         String sqlScript =
                 "-- Model Table\n" +
                         "CREATE TABLE Model (\n" +
@@ -117,7 +125,7 @@ public class CreateSqlScript {
                         "    metadata_id INT REFERENCES Metadata(id)\n" +
                         ");\n";
 
-        writeToFile("setup.sql", sqlScript);
+        writeToFile(Paths.get(SQL_DIR_PATH,SETUP_SCRIPT_NAME).toString(), sqlScript);
     }
 
     public void writeToFile(String fileName, String content) {
@@ -137,9 +145,10 @@ public class CreateSqlScript {
         }
     }
 
-    public void insertData() {
+    public void insertDataScripts() {
         ObjectMapper mapper = new ObjectMapper();
-        Path dirPath = Paths.get(JSON_DIR_PATH); // specify your directory path inside the get method
+        Path dirPath = Paths.get(JSON_DIR_PATH);
+        Path sqlFilesPath = Paths.get(SQL_DIR_PATH);
 
         try {
             Files.newDirectoryStream(dirPath).forEach(filePath -> {
@@ -152,7 +161,9 @@ public class CreateSqlScript {
                     }
                     String mltask = models.getModels().get(0).getMlTask();
                     String sqlScript = buildInsertSQL(models);
-                    writeToFile(String.format("insert_models_%s.sql", mltask), sqlScript);
+                    String fileName = String.format("insert_models_%s.sql", mltask);
+                    writeToFile(sqlFilesPath.resolve(fileName).toString(), sqlScript);
+
                     System.out.println(mltask + " sql file created successfully!");
                 }
             });
