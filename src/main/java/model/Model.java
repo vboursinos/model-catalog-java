@@ -9,6 +9,7 @@ public class Model {
 
     private List<String> incompatibleMetrics;
     private List<String> groups;
+    private boolean blackListed;
 
     public Model() {
     }
@@ -51,5 +52,13 @@ public class Model {
 
     public void setGroups(List<String> groups) {
         this.groups = groups;
+    }
+
+    public boolean isBlackListed() {
+        return blackListed;
+    }
+
+    public void setBlackListed(boolean blackListed) {
+        this.blackListed = blackListed;
     }
 }
