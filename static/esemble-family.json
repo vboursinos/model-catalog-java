@@ -1,0 +1,372 @@
+[
+  {
+    "model_name": "adagrad_classifier",
+    "ensembleType": "other",
+    "family": "linear"
+  },
+  {
+    "model_name": "ard_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "arima_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "auto_arima_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "auto_ets_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "base_reduction_stacking_classifier",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "base_reduction_stacking_regressor",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "bayesian_ridge_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "catboost_classifier",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "catboost_regressor",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "cd_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "cd_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "decision_tree_classifier",
+    "ensembleType": "none",
+    "family": "tree"
+  },
+  {
+    "model_name": "decision_tree_regressor",
+    "ensembleType": "none",
+    "family": "tree"
+  },
+  {
+    "model_name": "dlt_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "elastic_net_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "intelex_elastic_net_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "extra_trees_classifier",
+    "ensembleType": "forest",
+    "family": "tree"
+  },
+  {
+    "model_name": "feature_reduction_stacking_classifier",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "feature_reduction_stacking_regressor",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "fista_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "fista_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "gaussian_naivebayes_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "gaussian_process_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "gradient_boosting_classifier",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "gradient_boosting_regressor",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "hist_gradient_boosting_classifier",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "hist_gradient_boosting_regressor",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "huber_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "lgt_forecaster",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "lightgbm_classifier",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "lightgbm_regressor",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "linear_discriminant_analysis_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "linear_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "intelex_linear_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "linearsvc_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "linearsvr_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "logistic_regression_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "lasso_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "ridge regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "intelex_logistic_regression_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "lstm_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "mean_dummy_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "median_dummy_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "naive_drift_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "naive_last_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "naive_mean_forecaster",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "nearest_centroid_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "passive_aggressive_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "passive_aggressive_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "perceptron_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "prior_dummy_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "prophet_forecaster",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "quadratic_discriminant_analysis_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "random_forest_classifier",
+    "ensembleType": "forest",
+    "family": "tree"
+  },
+  {
+    "model_name": "intelex_random_forest_classifier",
+    "ensembleType": "forest",
+    "family": "tree"
+  },
+  {
+    "model_name": "random_forest_regressor",
+    "ensembleType": "forest",
+    "family": "tree"
+  },
+  {
+    "model_name": "intelex_random_forest_regressor",
+    "ensembleType": "forest",
+    "family": "tree"
+  },
+  {
+    "model_name": "saga_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "sdca_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "sgd_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "sgd_regressor",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "stacking_classifier",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "stacking_regressor",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "stratified_dummy_classifier",
+    "ensembleType": "other",
+    "family": "other"
+  },
+  {
+    "model_name": "svm_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "intelex_svm_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "svrg_classifier",
+    "ensembleType": "none",
+    "family": "linear"
+  },
+  {
+    "model_name": "svr_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "intelex_svr_regressor",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "uniform_dummy_classifier",
+    "ensembleType": "none",
+    "family": "other"
+  },
+  {
+    "model_name": "xgboost_classifier",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "xgboost_regressor",
+    "ensembleType": "other",
+    "family": "tree"
+  },
+  {
+    "model_name": "nlp_sequence_classifier",
+    "ensembleType": "other",
+    "family": "other"
+  }
+]
