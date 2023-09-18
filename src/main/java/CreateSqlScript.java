@@ -47,15 +47,15 @@ public class CreateSqlScript {
                         "    structure TEXT\n" +
                         ");\n\n" +
 
-                        "-- Parameters Table\n" +
-                        "CREATE TABLE Parameters (\n" +
+                        "-- Parameter Table\n" +
+                        "CREATE TABLE Parameter (\n" +
                         "    id SERIAL PRIMARY KEY,\n" +
                         "    model_id INT REFERENCES Model(id),\n" +
                         "    metadata_id INT REFERENCES Metadata(id)\n" +
                         ");\n\n" +
 
-                        "-- IncompatibleMetrics Table\n" +
-                        "CREATE TABLE IncompatibleMetrics (\n" +
+                        "-- IncompatibleMetric Table\n" +
+                        "CREATE TABLE IncompatibleMetric (\n" +
                         "    id SERIAL PRIMARY KEY,\n" +
                         "    metric TEXT,\n" +
                         "    model_id INT REFERENCES Model(id)\n" +
@@ -82,11 +82,11 @@ public class CreateSqlScript {
                         "    has_constraint BOOLEAN,\n" +
                         "    constraint_information TEXT,\n" +
                         "    fixed_value BOOLEAN,\n" +
-                        "    parameters_id INT REFERENCES Parameters(id)\n" +
+                        "    parameter_id INT REFERENCES Parameter(id)\n" +
                         ");\n\n" +
 
-                        "-- InputParameterValues Table\n" +
-                        "CREATE TABLE InputParameterValues (\n" +
+                        "-- InputParameterValue Table\n" +
+                        "CREATE TABLE InputParameterValue (\n" +
                         "    id SERIAL PRIMARY KEY,\n" +
                         "    value TEXT,\n" +
                         "    input_parameter_id INT REFERENCES InputParameter(id)\n" +
@@ -187,7 +187,7 @@ public class CreateSqlScript {
 
             sb.append("INSERT INTO Model(name, mlTask) VALUES ('").append(name).append("', '").append(mlTask).append("');\n");
             sb.append("INSERT INTO Metadata(model,model_description,display_name,structure) VALUES ('").append(metadata.getModel()).append("', '").append(modelDescription).append("', '").append(metadata.getDisplayName()).append("', '").append(metadata.getStructure()).append("');\n");
-            sb.append("INSERT INTO Parameters(model_id, metadata_id) VALUES ((select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'),(select id from metadata where model='").append(metadata.getModel()).append("'));\n");
+            sb.append("INSERT INTO Parameter(model_id, metadata_id) VALUES ((select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'),(select id from metadata where model='").append(metadata.getModel()).append("'));\n");
             for (String modelType : metadata.getModelType()) {
                 sb.append("INSERT INTO ModelType(type,metadata_id) values ('").append(modelType).append("', (select id from metadata where model='").append(metadata.getModel()).append("'));\n");
             }
@@ -208,7 +208,7 @@ public class CreateSqlScript {
 
             for (String incompatibleMetric : model.getIncompatibleMetrics()) {
                 incompatibleMetric = incompatibleMetric.replace("'", "''");
-                sb.append("INSERT INTO IncompatibleMetrics(metric,model_id) VALUES ('").append(incompatibleMetric).append("',(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n");
+                sb.append("INSERT INTO IncompatibleMetric(metric,model_id) VALUES ('").append(incompatibleMetric).append("',(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n");
             }
             for (String group : model.getGroups()) {
                 group = group.replace("'", "''");
@@ -216,10 +216,10 @@ public class CreateSqlScript {
             }
             for (InputParameter inputParameter : model.getParameter().getInputParameters()) {
                 String description = inputParameter.getDescription().replace("'", "''");
-                sb.append("INSERT INTO InputParameter(parameter_name,parameter_type,min_value,max_value,default_value,label,description,enabled,has_constraint,constraint_information,fixed_value,parameters_id) VALUES ('").append(inputParameter.getParameterName()).append("','").append(inputParameter.getParameterType()).append("','").append(inputParameter.getMinValue()).append("','").append(inputParameter.getMaxValue()).append("','").append(inputParameter.getDefaultValue()).append("','").append(inputParameter.getLabel()).append("','").append(description).append("',").append(inputParameter.isEnabled()).append(",").append(inputParameter.isConstraint()).append(",'").append(inputParameter.getConstraintInformation()).append("','").append(inputParameter.isFixedValue()).append("',(select id from parameters where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("')));\n");
+                sb.append("INSERT INTO InputParameter(parameter_name,parameter_type,min_value,max_value,default_value,label,description,enabled,has_constraint,constraint_information,fixed_value,parameter_id) VALUES ('").append(inputParameter.getParameterName()).append("','").append(inputParameter.getParameterType()).append("','").append(inputParameter.getMinValue()).append("','").append(inputParameter.getMaxValue()).append("','").append(inputParameter.getDefaultValue()).append("','").append(inputParameter.getLabel()).append("','").append(description).append("',").append(inputParameter.isEnabled()).append(",").append(inputParameter.isConstraint()).append(",'").append(inputParameter.getConstraintInformation()).append("','").append(inputParameter.isFixedValue()).append("',(select id from parameter where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("')));\n");
                 for (String value : inputParameter.getValues()) {
                     value = value.replace("'", "''");
-                    sb.append("INSERT INTO InputParameterValues(value,input_parameter_id) VALUES ('").append(value).append("',(select id from InputParameter where parameter_name='").append(inputParameter.getParameterName()).append("' and parameters_id=(select id from parameters where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'))));\n");
+                    sb.append("INSERT INTO InputParameterValue(value,input_parameter_id) VALUES ('").append(value).append("',(select id from InputParameter where parameter_name='").append(inputParameter.getParameterName()).append("' and parameter_id=(select id from parameter where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'))));\n");
                 }
             }
         }
