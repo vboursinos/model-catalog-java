@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Parameters {
+public class Parameter {
     public List<InputParameter> inputParameters;
     public Metadata metadata;
 
-    public Parameters() {
+    public Parameter() {
     }
 
     public List<InputParameter> getInputParameters() {

@@ -182,7 +182,7 @@ public class CreateSqlScript {
         for (Model model : models.getModels()) {
             String name = model.getName().replace("'", "''");
             String mlTask = model.getMlTask().replace("'", "''");
-            Metadata metadata = model.getParameters().getMetadata();
+            Metadata metadata = model.getParameter().getMetadata();
             String modelDescription = metadata.getModelDescription().replace("'", "''");
 
             sb.append("INSERT INTO Model(name, mlTask) VALUES ('").append(name).append("', '").append(mlTask).append("');\n");
@@ -214,7 +214,7 @@ public class CreateSqlScript {
                 group = group.replace("'", "''");
                 sb.append("INSERT INTO Groups(group_item,model_id) VALUES ('").append(group).append("',(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n");
             }
-            for (InputParameter inputParameter : model.getParameters().getInputParameters()) {
+            for (InputParameter inputParameter : model.getParameter().getInputParameters()) {
                 String description = inputParameter.getDescription().replace("'", "''");
                 sb.append("INSERT INTO InputParameter(parameter_name,parameter_type,min_value,max_value,default_value,label,description,enabled,has_constraint,constraint_information,fixed_value,parameters_id) VALUES ('").append(inputParameter.getParameterName()).append("','").append(inputParameter.getParameterType()).append("','").append(inputParameter.getMinValue()).append("','").append(inputParameter.getMaxValue()).append("','").append(inputParameter.getDefaultValue()).append("','").append(inputParameter.getLabel()).append("','").append(description).append("',").append(inputParameter.isEnabled()).append(",").append(inputParameter.isConstraint()).append(",'").append(inputParameter.getConstraintInformation()).append("','").append(inputParameter.isFixedValue()).append("',(select id from parameters where model_id=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("')));\n");
                 for (String value : inputParameter.getValues()) {

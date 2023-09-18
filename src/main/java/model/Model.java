@@ -5,7 +5,7 @@ import java.util.List;
 public class Model {
     private String name;
     private String mlTask;
-    private Parameters parameters;
+    private Parameter parameter;
 
     private List<String> incompatibleMetrics;
     private List<String> groups;
@@ -30,12 +30,12 @@ public class Model {
         this.mlTask = mlTask;
     }
 
-    public Parameters getParameters() {
-        return parameters;
+    public Parameter getParameter() {
+        return parameter;
     }
 
-    public void setParameters(Parameters parameters) {
-        this.parameters = parameters;
+    public void setParameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     public List<String> getIncompatibleMetrics() {
