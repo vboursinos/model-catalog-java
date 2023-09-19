@@ -13,15 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public class CreateSqlScript {
-    //todo add to db blacklist information (in each model we can have a boolena filed if this model is blacklisted or not) If it is blacklisted we don't show it in the UI
     private static final Logger logger = LogManager.getLogger(CreateSqlScript.class);
-
     private static final String JSON_DIR_PATH = "model_infos";
     private static final String SQL_DIR_PATH = "sql_scripts";
-
     private static final String SETUP_SCRIPT_NAME = "setup.sql";
 
     public CreateSqlScript() {
@@ -34,7 +31,21 @@ public class CreateSqlScript {
     }
 
     public void createTablesScript() {
-        String sqlScript = "-- ModelType Table\n" +
+        String sqlScript = getSqlScript();
+        writeToFile(Paths.get(SQL_DIR_PATH, SETUP_SCRIPT_NAME).toString(), sqlScript);
+    }
+
+    public void writeToFile(String fileName, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write(content);
+        } catch (IOException e) {
+            logger.error("Error writing to file: " + e.getMessage(), e);
+        }
+    }
+
+    //Methods for creating SQL scripts....
+    private String getSqlScript() {
+        return  "-- ModelType Table\n" +
                 "CREATE TABLE ModelType (\n" +
                 "    id SERIAL PRIMARY KEY,\n" +
                 "    name VARCHAR(255)\n" +
@@ -147,74 +158,41 @@ public class CreateSqlScript {
                 "    metricName VARCHAR(255),\n" +
                 "    FOREIGN KEY (modelId) REFERENCES Model(id)\n" +
                 ");\n";
-        writeToFile(Paths.get(SQL_DIR_PATH, SETUP_SCRIPT_NAME).toString(), sqlScript);
-    }
-
-    public void writeToFile(String fileName, String content) {
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(fileName));
-            writer.write(content);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                assert writer != null;
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void insertDataScripts() {
         ObjectMapper mapper = new ObjectMapper();
-        Path dirPath = Paths.get(JSON_DIR_PATH);
-        Path sqlFilesPath = Paths.get(SQL_DIR_PATH);
         Set<String> allModelTypes = new HashSet<>();
-        try {
-            Files.newDirectoryStream(dirPath).forEach(filePath -> {
-                if (Files.isRegularFile(filePath)) {
-                    Models models;
-                    try {
-                        models = mapper.readValue(filePath.toFile(), Models.class);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    Set<String> modelTypes = getModelTypes(models);
-                    allModelTypes.addAll(modelTypes);
-                }
-            });
-        } catch (IOException e) {
-            logger.error("Error reading files from directory: " + e.getMessage());
-        }
+        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
+                models -> allModelTypes.addAll(getModelTypes(models)));
         String insertModelTypeScript = buildInsertModelTypeSQL(allModelTypes);
-        AtomicReference<String> fileName = new AtomicReference<>("insert_model_type.sql");
-        writeToFile(sqlFilesPath.resolve(fileName.get()).toString(), insertModelTypeScript);
-        fileName.set("insert_model_group.sql");
-        writeToFile(sqlFilesPath.resolve(fileName.get()).toString(), buildInsertModelGroupSQL());
-        System.out.println(allModelTypes);
+        writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_type.sql").toString(), insertModelTypeScript);
+        writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_group.sql").toString(), buildInsertModelGroupSQL());
+        logger.info(allModelTypes.toString());
+        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH), models -> createModelSqlFile(mapper, models));
+    }
+
+    private void processModelsInDirectory(ObjectMapper mapper, Path dirPath, Consumer<Models> modelProcessor) {
         try {
             Files.newDirectoryStream(dirPath).forEach(filePath -> {
                 if (Files.isRegularFile(filePath)) {
-                    Models models;
                     try {
-                        models = mapper.readValue(filePath.toFile(), Models.class);
+                        modelProcessor.accept(mapper.readValue(filePath.toFile(), Models.class));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    String mltask = models.getModels().get(0).getMlTask();
-                    String sqlScript = buildInsertSQL(models);
-                    fileName.set(String.format("insert_models_%s.sql", mltask));
-                    writeToFile(sqlFilesPath.resolve(fileName.get()).toString(), sqlScript);
-
-                    logger.info(mltask + " sql file created successfully!");
                 }
             });
         } catch (IOException e) {
-            logger.error("Error reading files from directory: " + e.getMessage());
+            logger.error("Error reading files from directory: " + e.getMessage(), e);
         }
+    }
 
+    private void createModelSqlFile(ObjectMapper mapper, Models models) {
+        String mltask = models.getModels().get(0).getMlTask();
+        String sqlScript = buildInsertSQL(models);
+        writeToFile(Paths.get(SQL_DIR_PATH, String.format("insert_models_%s.sql", mltask)).toString(), sqlScript);
+        logger.info(mltask + " sql file created successfully!");
     }
 
     static Set<String> getModelTypes(Models models) {
