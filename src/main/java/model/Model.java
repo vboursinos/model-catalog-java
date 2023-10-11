@@ -5,8 +5,13 @@ import java.util.List;
 public class Model {
     private String name;
     private String mlTask;
-    private Parameter parameter;
+    //    private Parameter parameter;
+    public Metadata metadata;
 
+
+    private List<HyperParameter> hyperParameters;
+
+    private List<ConstraintEdge> constraintEdges;
     private List<String> incompatibleMetrics;
     private List<String> groups;
     private boolean blackListed;
@@ -30,13 +35,13 @@ public class Model {
         this.mlTask = mlTask;
     }
 
-    public Parameter getParameter() {
-        return parameter;
-    }
-
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
-    }
+//    public Parameter getParameter() {
+//        return parameter;
+//    }
+//
+//    public void setParameter(Parameter parameter) {
+//        this.parameter = parameter;
+//    }
 
     public List<String> getIncompatibleMetrics() {
         return incompatibleMetrics;
@@ -60,5 +65,29 @@ public class Model {
 
     public void setBlackListed(boolean blackListed) {
         this.blackListed = blackListed;
+    }
+
+    public List<HyperParameter> getHyperParameters() {
+        return hyperParameters;
+    }
+
+    public void setHyperParameters(List<HyperParameter> hyperParameters) {
+        this.hyperParameters = hyperParameters;
+    }
+
+    public List<ConstraintEdge> getConstraintEdges() {
+        return constraintEdges;
+    }
+
+    public void setConstraintEdges(List<ConstraintEdge> constraintEdges) {
+        this.constraintEdges = constraintEdges;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 }

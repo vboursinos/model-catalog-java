@@ -11,7 +11,7 @@ public class Metadata {
     private List<String> prime;
     private String displayName;
     private Support supports;
-    private List<String> deps;
+//    private List<String> deps;
     private String structure;
 
     public Metadata() {
@@ -81,13 +81,13 @@ public class Metadata {
         this.supports = supports;
     }
 
-    public List<String> getDeps() {
-        return deps;
-    }
-
-    public void setDeps(List<String> deps) {
-        this.deps = deps;
-    }
+//    public List<String> getDeps() {
+//        return deps;
+//    }
+//
+//    public void setDeps(List<String> deps) {
+//        this.deps = deps;
+//    }
 
     public String getStructure() {
         return structure;

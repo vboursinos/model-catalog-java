@@ -2,7 +2,7 @@ package model;
 
 public class Support {
    private boolean probabilities;
-   private boolean featureImportances;
+   private boolean featureImportance;
    private boolean decisionTree;
 
     public Support() {
@@ -16,12 +16,12 @@ public class Support {
       this.probabilities = probabilities;
    }
 
-   public boolean getFeatureImportances() {
-      return featureImportances;
+   public boolean getFeatureImportance() {
+      return featureImportance;
    }
 
-   public void setFeatureImportances(boolean featureImportances) {
-      this.featureImportances = featureImportances;
+   public void setFeatureImportance(boolean featureImportance) {
+      this.featureImportance = featureImportance;
    }
 
    public boolean getDecisionTree() {
