@@ -23,11 +23,22 @@ public class CreateInsertScripts {
     public void insertDataScripts() {
         ObjectMapper mapper = new ObjectMapper();
         Set<String> allModelTypes = new HashSet<>();
+        Set<String> allModelStructureTypes = new HashSet<>();
+        Set<String> allMlTasks = new HashSet<>();
+        Set<String> allMetrics = new HashSet<>();
         processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
                 models -> allModelTypes.addAll(getModelTypes(models)));
-        String insertModelTypeScript = buildInsertModelTypeSQL(allModelTypes);
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_type.sql").toString(), insertModelTypeScript);
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_group.sql").toString(), buildInsertModelGroupSQL());
+        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
+                models -> allModelStructureTypes.addAll(getModelStructureTypes(models)));
+        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
+                models -> allMlTasks.addAll(getMlTasks(models)));
+        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
+                models -> allMetrics.addAll(getMetrics(models)));
+        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_type.sql").toString(), buildInsertModelTypeSQL(allModelTypes));
+        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_group_type.sql").toString(), buildInsertGroupTypeSQL());
+        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_structure_type.sql").toString(), buildInsertModelStructureTypeSQL(allModelStructureTypes));
+        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_ml_task.sql").toString(), buildInsertMlTaskSQL(allMlTasks));
+        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_metrics.sql").toString(), buildMetricSQL(allMetrics));
         logger.info(allModelTypes.toString());
         processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH), this::createModelSqlFile);
     }
@@ -58,12 +69,41 @@ public class CreateInsertScripts {
     static Set<String> getModelTypes(Models models) {
         Set<String> modelTypes = new HashSet<>();
         for (Model model : models.getModels()) {
-            List<String> modelType = model.getParameter().getMetadata().getModelType();
+            List<String> modelType = model.getMetadata().getModelType();
             if (modelType != null && !modelType.isEmpty()) {
                 modelTypes.add(modelType.get(0));
             }
         }
         return modelTypes;
+    }
+
+    static Set<String> getModelStructureTypes(Models models) {
+        Set<String> modelStructureTypes = new HashSet<>();
+        for (Model model : models.getModels()) {
+            String modelStructure = model.getMetadata().getStructure();
+            modelStructureTypes.add(modelStructure);
+        }
+        return modelStructureTypes;
+    }
+
+    static Set<String> getMlTasks(Models models) {
+        Set<String> mlTaskSet = new HashSet<>();
+        for (Model model : models.getModels()) {
+            String mlTask = model.getMlTask();
+            mlTaskSet.add(mlTask);
+        }
+        return mlTaskSet;
+    }
+
+    static Set<String> getMetrics(Models models) {
+        Set<String> metrics = new HashSet<>();
+        for (Model model : models.getModels()) {
+            List<String> incompatibleMetrics = model.getIncompatibleMetrics();
+            if (incompatibleMetrics != null && !incompatibleMetrics.isEmpty()) {
+                metrics.addAll(incompatibleMetrics);
+            }
+        }
+        return metrics;
     }
 
     static String buildInsertModelTypeSQL(Set<String> modelTypes) {
@@ -74,17 +114,42 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    static String buildInsertModelGroupSQL() {
+    static String buildInsertModelStructureTypeSQL(Set<String> modelStructureTypes) {
+        StringBuilder sb = new StringBuilder();
+        for (String modelStructureType : modelStructureTypes) {
+            sb.append("INSERT INTO model_structure_type(name) VALUES ('").append(modelStructureType).append("');\n");
+        }
+        return sb.toString();
+    }
+
+    static String buildInsertMlTaskSQL(Set<String> mlTaskSet) {
+        StringBuilder sb = new StringBuilder();
+        for (String mlTask : mlTaskSet) {
+            sb.append("INSERT INTO ml_task(name) VALUES ('").append(mlTask).append("');\n");
+        }
+        return sb.toString();
+    }
+
+    static String buildMetricSQL(Set<String> metricSet) {
+        StringBuilder sb = new StringBuilder();
+        for (String metric : metricSet) {
+            sb.append("INSERT INTO metric(name) VALUES ('").append(metric).append("');\n");
+        }
+        return sb.toString();
+    }
+
+    static String buildInsertGroupTypeSQL() {
         StringBuilder sb = new StringBuilder();
         Properties properties = PropertiesConfig.getProperties();
         String groupsProperty = properties.getProperty("groups");
         List<String> groups = Arrays.asList(groupsProperty.split(","));
 
         for (String group : groups) {
-            sb.append("INSERT INTO ModelGroup(name) VALUES ('").append(group).append("');\n");
+            sb.append("INSERT INTO group_type(name) VALUES ('").append(group).append("');\n");
         }
         return sb.toString();
     }
+
     static String buildInsertSQL(Models models) {
         List<EnsembleFamily> ensembleFamilies = getEnsembleFamilies();
 
@@ -99,7 +164,8 @@ public class CreateInsertScripts {
     private static List<EnsembleFamily> getEnsembleFamilies() {
         List<EnsembleFamily> ensembleFamilies = null;
         try {
-            ensembleFamilies = objectMapper.readValue(Paths.get("static", "ensemble-family.json").toFile(), new TypeReference<List<EnsembleFamily>>() {});
+            ensembleFamilies = objectMapper.readValue(Paths.get("static", "ensemble-family.json").toFile(), new TypeReference<List<EnsembleFamily>>() {
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,7 +175,7 @@ public class CreateInsertScripts {
     private static void processModel(Model model, List<EnsembleFamily> ensembleFamilies, StringBuilder sb) {
         String name = model.getName().replace("'", "''");
         String mlTask = model.getMlTask().replace("'", "''");
-        Metadata metadata = model.getParameter().getMetadata();
+        Metadata metadata = model.getMetadata();
         replaceSingleQuotesInMetadata(metadata);
 
         sb.append(buildInsertIntoModelSQL(name, mlTask, metadata, model.isBlackListed()));
@@ -120,7 +186,7 @@ public class CreateInsertScripts {
         sb.append(buildInsertIntoIncompatibleMetricSQL(name, model));
     }
 
-    private static String buildInsertIntoIncompatibleMetricSQL(String name, Model model){
+    private static String buildInsertIntoIncompatibleMetricSQL(String name, Model model) {
         StringBuilder sb = new StringBuilder();
         for (String metric : model.getIncompatibleMetrics()) {
             sb.append("INSERT INTO IncompatibleMetric(modelId, metricName) VALUES ((select id from Model where name='").append(name).append("'), '").append(metric).append("');\n");
@@ -128,7 +194,7 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static void replaceSingleQuotesInMetadata(Metadata metadata){
+    private static void replaceSingleQuotesInMetadata(Metadata metadata) {
         List<String> advantages = metadata.getAdvantages().stream()
                 .map(s -> s.replace("'", "''"))
                 .collect(Collectors.toList());
@@ -143,7 +209,7 @@ public class CreateInsertScripts {
         metadata.setModelDescription(modelDescription);
     }
 
-    private static String buildInsertIntoModelSQL(String name, String mlTask, Metadata metadata, boolean isBlackListed){
+    private static String buildInsertIntoModelSQL(String name, String mlTask, Metadata metadata, boolean isBlackListed) {
         StringBuilder sb = new StringBuilder();
 
         String advantagesArray = "{" + String.join(",", metadata.getAdvantages()) + "}";
@@ -164,20 +230,20 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String buildInsertIntoModelDependencySQL(String name, String mlTask, Metadata metadata){
+    private static String buildInsertIntoModelDependencySQL(String name, String mlTask, Metadata metadata) {
         StringBuilder sb = new StringBuilder();
 
-        for (String dep : metadata.getDeps()) {
-            sb.append("INSERT INTO ModelDependency(modelId, name) VALUES ((select id from Model where name='").
-                    append(name).append("' and mlTask='").
-                    append(mlTask).append("'),").
-                    append("'").append(dep).
-                    append("');\n");
-        }
+//        for (String dep : metadata.getDeps()) {
+//            sb.append("INSERT INTO ModelDependency(modelId, name) VALUES ((select id from Model where name='").
+//                    append(name).append("' and mlTask='").
+//                    append(mlTask).append("'),").
+//                    append("'").append(dep).
+//                    append("');\n");
+//        }
         return sb.toString();
     }
 
-    private static String buildInsertIntoModelToGroupSQL(String name, String mlTask, List<String> modelGroups){
+    private static String buildInsertIntoModelToGroupSQL(String name, String mlTask, List<String> modelGroups) {
         StringBuilder sb = new StringBuilder();
 
         for (String group : modelGroups) {
@@ -191,23 +257,23 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String buildInsertIntoParameterAndParameterValueSQL(String name, String mlTask, Model model, Metadata metadata){
+    private static String buildInsertIntoParameterAndParameterValueSQL(String name, String mlTask, Model model, Metadata metadata) {
         StringBuilder sb = new StringBuilder();
 
         List<String> prime = Optional.ofNullable(metadata.getPrime()).orElse(Collections.emptyList());
 
-        List<InputParameter> parametersInPrime = new ArrayList<>();
-        List<InputParameter> parametersNotInPrime = new ArrayList<>();
+        List<HyperParameter> parametersInPrime = new ArrayList<>();
+        List<HyperParameter> parametersNotInPrime = new ArrayList<>();
 
-        for (InputParameter parameter : model.getParameter().getInputParameters()) {
-            if (prime.contains(parameter.getParameterName())) {
+        for (HyperParameter parameter : model.getHyperParameters()) {
+            if (prime.contains(parameter.getName())) {
                 parametersInPrime.add(parameter);
             } else {
                 parametersNotInPrime.add(parameter);
             }
         }
 
-        List<InputParameter> orderedParameters = new ArrayList<>();
+        List<HyperParameter> orderedParameters = new ArrayList<>();
         orderedParameters.addAll(parametersInPrime);
         orderedParameters.addAll(parametersNotInPrime);
 
@@ -216,35 +282,33 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String insertIntoParameterAndParameterValue(List<InputParameter> orderedParameters, String name, String mlTask) {
+    private static String insertIntoParameterAndParameterValue(List<HyperParameter> orderedParameters, String name, String mlTask) {
         StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (InputParameter parameter : orderedParameters) {
+        for (HyperParameter parameter : orderedParameters) {
             String description = parameter.getDescription().replace("'", "''");
             count++;
             sb.append(insertParameterSQL(parameter, description, count, name, mlTask));
-
-            for (String value : parameter.getValues()) {
-                value = value.replace("'", "''");
-                sb.append(insertParameterValueSQL(value, parameter, name, mlTask));
-            }
+//
+//            for (String value : parameter.getValues()) {
+//                value = value.replace("'", "''");
+//                sb.append(insertParameterValueSQL(value, parameter, name, mlTask));
+//            }
         }
         return sb.toString();
     }
 
-    private static String insertParameterSQL(InputParameter parameter, String description, int count, String name, String mlTask) {
-        return new StringBuilder("INSERT INTO Parameter(parameterType, name, minValue, maxValue, defaultValue, label, description, enabled, hasConstraint, constraintInformation, fixedValue, ordering, modelId) VALUES ('")
-                .append(parameter.getParameterType()).append("', '")
-                .append(parameter.getParameterName()).append("', '")
-                .append(parameter.getMinValue()).append("', '")
-                .append(parameter.getMaxValue()).append("', '")
+    private static String insertParameterSQL(HyperParameter parameter, String description, int count, String name, String mlTask) {
+        return new StringBuilder("INSERT INTO Parameter(parameterType, name, defaultValue, label, description, enabled, hasConstraint, constraintInformation, fixedValue, ordering, modelId) VALUES ('")
+//                .append(parameter.getParameterType()).append("', '")
+                .append(parameter.getName()).append("', '")
                 .append(parameter.getDefaultValue()).append("',")
                 .append("'").append(parameter.getLabel()).append("',")
                 .append("'").append(description).append("',")
-                .append(parameter.isEnabled()).append(",")
-                .append(parameter.isConstraint()).append(",")
+                .append(parameter.getEnabled()).append(",")
+                .append(parameter.getConstraint()).append(",")
                 .append("'").append(parameter.getConstraintInformation()).append("',")
-                .append(parameter.isFixedValue()).append(",")
+//                .append(parameter.isFixedValue()).append(",")
                 .append(count).append(",")
                 .append("(select id from Model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n")
                 .toString();
@@ -271,7 +335,7 @@ public class CreateInsertScripts {
                     .append(name).append("' and mlTask='")
                     .append(mlTask).append("'),")
                     .append(metadata.getSupports().getProbabilities()).append(",")
-                    .append(metadata.getSupports().getFeatureImportances()).append(",")
+                    .append(metadata.getSupports().getFeatureImportance()).append(",")
                     .append(metadata.getSupports().getDecisionTree()).append(",'")
                     .append(matchingFamily.getEnsembleType()).append("','")
                     .append(matchingFamily.getFamily()).append("');\n");
