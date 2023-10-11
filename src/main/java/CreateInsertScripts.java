@@ -120,7 +120,7 @@ public class CreateInsertScripts {
     static String buildInsertModelTypeSQL(Set<String> modelTypes) {
         StringBuilder sb = new StringBuilder();
         for (String modelType : modelTypes) {
-            sb.append("INSERT INTO ModelType(name) VALUES ('").append(modelType).append("');\n");
+            sb.append("INSERT INTO model_type(name) VALUES ('").append(modelType).append("');\n");
         }
         return sb.toString();
     }
@@ -214,11 +214,11 @@ public class CreateInsertScripts {
         replaceSingleQuotesInMetadata(metadata);
 
         sb.append(buildInsertIntoModelSQL(name, mlTask, metadata, model.isBlackListed()));
-        sb.append(buildInsertIntoModelDependencySQL(name, mlTask, metadata));
-        sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
-        sb.append(buildInsertIntoParameterAndParameterValueSQL(name, mlTask, model, metadata));
-        sb.append(buildInsertIntoModelMetadataSQL(name, mlTask, model, ensembleFamilies, metadata));
-        sb.append(buildInsertIntoIncompatibleMetricSQL(name, model));
+//        sb.append(buildInsertIntoModelDependencySQL(name, mlTask, metadata));
+//        sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
+//        sb.append(buildInsertIntoParameterAndParameterValueSQL(name, mlTask, model, metadata));
+//        sb.append(buildInsertIntoModelMetadataSQL(name, mlTask, model, ensembleFamilies, metadata));
+//        sb.append(buildInsertIntoIncompatibleMetricSQL(name, model));
     }
 
     private static String buildInsertIntoIncompatibleMetricSQL(String name, Model model) {
@@ -250,16 +250,18 @@ public class CreateInsertScripts {
         String advantagesArray = "{" + String.join(",", metadata.getAdvantages()) + "}";
         String disadvantagesArray = "{" + String.join(",", metadata.getDisadvantages()) + "}";
 
-        sb.append("INSERT INTO Model(name, mlTask, description, displayName, structure, advantages, disadvantages, isEnabled, modelTypeId) VALUES ('").
-                append(name).append("', '").
-                append(mlTask).append("', '").
+        sb.append("INSERT INTO Model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, model_type_id) VALUES ('").
+                append(name).append("', ").
+                append("(select id from ml_task where name='").
+                append(mlTask).append("'),'").
                 append(metadata.getModelDescription()).append("', '").
-                append(metadata.getDisplayName()).append("', '").
-                append(metadata.getStructure()).append("', '").
+                append(metadata.getDisplayName()).append("', ").
+                append("(select id from model_structure_type where name='").
+                append(metadata.getStructure()).append("'), '").
                 append(advantagesArray).append("', '").
                 append(disadvantagesArray).append("',").
                 append(isBlackListed).append(",").
-                append("(select id from ModelType where name='").
+                append("(select id from model_type where name='").
                 append(metadata.getModelType().get(0)).append("'));\n");
 
         return sb.toString();
