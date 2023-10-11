@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CreateInsertScripts {
@@ -22,25 +23,35 @@ public class CreateInsertScripts {
 
     public void insertDataScripts() {
         ObjectMapper mapper = new ObjectMapper();
-        Set<String> allModelTypes = new HashSet<>();
-        Set<String> allModelStructureTypes = new HashSet<>();
-        Set<String> allMlTasks = new HashSet<>();
-        Set<String> allMetrics = new HashSet<>();
-        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
-                models -> allModelTypes.addAll(getModelTypes(models)));
-        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
-                models -> allModelStructureTypes.addAll(getModelStructureTypes(models)));
-        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
-                models -> allMlTasks.addAll(getMlTasks(models)));
-        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH),
-                models -> allMetrics.addAll(getMetrics(models)));
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_type.sql").toString(), buildInsertModelTypeSQL(allModelTypes));
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_group_type.sql").toString(), buildInsertGroupTypeSQL());
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_model_structure_type.sql").toString(), buildInsertModelStructureTypeSQL(allModelStructureTypes));
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_ml_task.sql").toString(), buildInsertMlTaskSQL(allMlTasks));
-        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, "insert_metrics.sql").toString(), buildMetricSQL(allMetrics));
+
+        //Get unique values from JSON files
+        Path dirPath = Paths.get(JSON_DIR_PATH);
+        Set<String> allModelTypes = extractUniqueValues(mapper, dirPath, CreateInsertScripts::getModelTypes);
+        Set<String> allModelStructureTypes = extractUniqueValues(mapper, dirPath, CreateInsertScripts::getModelStructureTypes);
+        Set<String> allMlTasks = extractUniqueValues(mapper, dirPath, CreateInsertScripts::getMlTasks);
+        Set<String> allMetrics = extractUniqueValues(mapper, dirPath, CreateInsertScripts::getMetrics);
+
+        // Write values to SQL files
+        createSQLFile("insert_model_type.sql", buildInsertModelTypeSQL(allModelTypes));
+        createSQLFile("insert_group_type.sql", buildInsertGroupTypeSQL());
+        createSQLFile("insert_parameter_type.sql", buildParameterTypeSQL());
+        createSQLFile("insert_distribution.sql", buildDistributionSQL());
+        createSQLFile("insert_model_structure_type.sql", buildInsertModelStructureTypeSQL(allModelStructureTypes));
+        createSQLFile("insert_ml_task.sql", buildInsertMlTaskSQL(allMlTasks));
+        createSQLFile("insert_metrics.sql", buildMetricSQL(allMetrics));
+
         logger.info(allModelTypes.toString());
-        processModelsInDirectory(mapper, Paths.get(JSON_DIR_PATH), this::createModelSqlFile);
+        processModelsInDirectory(mapper, dirPath, this::createModelSqlFile);
+    }
+
+    private void createSQLFile(String fileName, String content) {
+        FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, fileName).toString(), content);
+    }
+
+    private Set<String> extractUniqueValues(ObjectMapper mapper, Path dirPath, Function<Models, Set<String>> valueExtractor) {
+        Set<String> uniqueValues = new HashSet<>();
+        processModelsInDirectory(mapper, dirPath, models -> uniqueValues.addAll(valueExtractor.apply(models)));
+        return uniqueValues;
     }
 
     private void processModelsInDirectory(ObjectMapper mapper, Path dirPath, Consumer<Models> modelProcessor) {
@@ -146,6 +157,30 @@ public class CreateInsertScripts {
 
         for (String group : groups) {
             sb.append("INSERT INTO group_type(name) VALUES ('").append(group).append("');\n");
+        }
+        return sb.toString();
+    }
+
+    static String buildParameterTypeSQL() {
+        StringBuilder sb = new StringBuilder();
+        Properties properties = PropertiesConfig.getProperties();
+        String parameterTypesProperty = properties.getProperty("parameter_types");
+        List<String> parameterTypes = Arrays.asList(parameterTypesProperty.split(","));
+
+        for (String parameterType : parameterTypes) {
+            sb.append("INSERT INTO parameter_type(name) VALUES ('").append(parameterType).append("');\n");
+        }
+        return sb.toString();
+    }
+
+    static String buildDistributionSQL() {
+        StringBuilder sb = new StringBuilder();
+        Properties properties = PropertiesConfig.getProperties();
+        String distributionProperty = properties.getProperty("distribution");
+        List<String> distributionTypes = Arrays.asList(distributionProperty.split(","));
+
+        for (String distributionType : distributionTypes) {
+            sb.append("INSERT INTO parameter_distribution_type(name) VALUES ('").append(distributionType).append("');\n");
         }
         return sb.toString();
     }
