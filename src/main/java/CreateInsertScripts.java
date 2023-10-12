@@ -215,16 +215,17 @@ public class CreateInsertScripts {
 
         sb.append(buildInsertIntoModelSQL(name, mlTask, metadata, model.isBlackListed()));
 //        sb.append(buildInsertIntoModelDependencySQL(name, mlTask, metadata));
-//        sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
+        sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
 //        sb.append(buildInsertIntoParameterAndParameterValueSQL(name, mlTask, model, metadata));
-//        sb.append(buildInsertIntoModelMetadataSQL(name, mlTask, model, ensembleFamilies, metadata));
-//        sb.append(buildInsertIntoIncompatibleMetricSQL(name, model));
+        sb.append(buildInsertIntoModelMetadataSQL(name, mlTask, model, ensembleFamilies, metadata));
+        sb.append(buildInsertIntoIncompatibleMetricSQL(name, model));
     }
 
     private static String buildInsertIntoIncompatibleMetricSQL(String name, Model model) {
         StringBuilder sb = new StringBuilder();
         for (String metric : model.getIncompatibleMetrics()) {
-            sb.append("INSERT INTO IncompatibleMetric(modelId, metricName) VALUES ((select id from Model where name='").append(name).append("'), '").append(metric).append("');\n");
+            sb.append("INSERT INTO incompatible_metric(model_id, metric_id) VALUES ((select id from model where name='")
+                    .append(name).append("'), (select id from metric where name='").append(metric).append("'));\n");
         }
         return sb.toString();
     }
@@ -250,7 +251,7 @@ public class CreateInsertScripts {
         String advantagesArray = "{" + String.join(",", metadata.getAdvantages()) + "}";
         String disadvantagesArray = "{" + String.join(",", metadata.getDisadvantages()) + "}";
 
-        sb.append("INSERT INTO Model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, model_type_id) VALUES ('").
+        sb.append("INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, model_type_id) VALUES ('").
                 append(name).append("', ").
                 append("(select id from ml_task where name='").
                 append(mlTask).append("'),'").
@@ -284,10 +285,9 @@ public class CreateInsertScripts {
         StringBuilder sb = new StringBuilder();
 
         for (String group : modelGroups) {
-            sb.append("INSERT INTO ModelToGroup(modelId, groupId) VALUES ((select id from Model where name='").
-                    append(name).append("' and mlTask='").
-                    append(mlTask).append("'),").
-                    append("(select id from ModelGroup where name='").
+            sb.append("INSERT INTO model_group(model_id, group_id) VALUES ((select id from Model where name='").
+                    append(name).append("'),").
+                    append("(select id from group_type where name='").
                     append(group).append("'));\n");
         }
 
@@ -368,11 +368,8 @@ public class CreateInsertScripts {
         }
 
         if (matchingFamily != null) {
-            sb.append("INSERT INTO ModelMetadata(modelId, probabilities, featureImportances, decisionTree, ensembleType, family) VALUES ((select id from Model where name='")
-                    .append(name).append("' and mlTask='")
-                    .append(mlTask).append("'),")
-                    .append(metadata.getSupports().getProbabilities()).append(",")
-                    .append(metadata.getSupports().getFeatureImportance()).append(",")
+            sb.append("INSERT INTO model_metadata(model_id, decision_tree, ensemble_type, family) VALUES ((select id from model where name='")
+                    .append(name).append("'),")
                     .append(metadata.getSupports().getDecisionTree()).append(",'")
                     .append(matchingFamily.getEnsembleType()).append("','")
                     .append(matchingFamily.getFamily()).append("');\n");
