@@ -275,6 +275,9 @@ public class CreateInsertScripts {
                         strDefaultValue = (String) defaultValue;
                     }
                     sb.append("INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(strDefaultValue).append("');\n");
+                    for (Object value : parameter.getDomain().getCategoricalSet().getCategories()) {
+                        sb.append("INSERT INTO categorical_parameter_value(parameter_type_definition_id, value ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(value).append("');\n");
+                    }
                 }
                 if (parameterType.getParameterType().equals("float")){
                     Float floatDefaultValue = null;
@@ -284,6 +287,9 @@ public class CreateInsertScripts {
                         floatDefaultValue = ((Double) defaultValue).floatValue();
                     }
                     sb.append("INSERT INTO float_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(floatDefaultValue).append(");\n");
+                    for (Interval interval : parameter.getDomain().getFloatSet().getIntervals()) {
+                        sb.append("INSERT INTO float_parameter_range(parameter_type_definition_id, is_left_open, is_right_open, lower, upper ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(interval.getLeft()).append(", ").append(interval.getRight()).append(", ").append(interval.getLower()).append(", ").append(interval.getUpper()).append(");\n");
+                    }
                 }
                 if (parameterType.getParameterType().equals("integer")){
                     Integer intDefaultValue = null;
@@ -291,6 +297,9 @@ public class CreateInsertScripts {
                         intDefaultValue = (Integer) defaultValue;
                     }
                     sb.append("INSERT INTO integer_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(intDefaultValue).append(");\n");
+                    for (Range range : parameter.getDomain().getIntegerSet().getRanges()) {
+                        sb.append("INSERT INTO integer_parameter_range(parameter_type_definition_id, start, stop ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(range.getStart()).append(", ").append(range.getStop()).append(");\n");
+                    }
                 }
                 if (parameterType.getParameterType().equals("boolean")){
                     Boolean boolDefaultValue = null;
