@@ -213,19 +213,103 @@ public class CreateInsertScripts {
         Metadata metadata = model.getMetadata();
         replaceSingleQuotesInMetadata(metadata);
 
-        sb.append(buildInsertIntoModelSQL(name, mlTask, metadata, model.isBlackListed()));
+        sb.append(buildInsertIntoModelSQL(model));
 //        sb.append(buildInsertIntoModelDependencySQL(name, mlTask, metadata));
         sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
-//        sb.append(buildInsertIntoParameterAndParameterValueSQL(name, mlTask, model, metadata));
-        sb.append(buildInsertIntoModelMetadataSQL(name, mlTask, model, ensembleFamilies, metadata));
-        sb.append(buildInsertIntoIncompatibleMetricSQL(name, model));
+        sb.append(buildInsertIntoParameterAndParameterValueSQL(model));
+        sb.append(buildInsertIntoModelMetadataSQL(model, ensembleFamilies));
+        sb.append(buildInsertIntoIncompatibleMetricSQL(model));
+        sb.append(buildInsertIntoParameterTypeDefinitionSQL(model));
+        sb.append(buildInsertRestParameterTablesSQL(model));
     }
 
-    private static String buildInsertIntoIncompatibleMetricSQL(String name, Model model) {
+    private static List<ParameterTypeDistribution> getParameterTypeDistributionList(HyperParameter parameter) {
+        List<ParameterTypeDistribution> parameterTypes = new ArrayList<>();
+        Domain domain = parameter.getDomain();
+
+        if (domain.getCategoricalSet() != null && !domain.getCategoricalSet().getCategories().isEmpty()) {
+            String distributionType = (parameter.getDefaultValue().equals(true) || parameter.getDefaultValue().equals(false)) ? "boolean" : "categorical";
+            parameterTypes.add(new ParameterTypeDistribution(distributionType, "uniform"));
+        }
+
+        if (domain.getFloatSet() != null && !domain.getFloatSet().getIntervals().isEmpty()) {
+            parameterTypes.add(new ParameterTypeDistribution("float", parameter.getDistribution().getFloatDistribution()));
+        }
+
+        if (domain.getIntegerSet() != null && !domain.getIntegerSet().getRanges().isEmpty()) {
+            parameterTypes.add(new ParameterTypeDistribution("integer", parameter.getDistribution().getIntegerDistribution()));
+        }
+        return parameterTypes;
+    }
+
+    private static String buildInsertIntoParameterTypeDefinitionSQL(Model model) {
+        StringBuilder sb = new StringBuilder();
+
+        for (HyperParameter parameter : model.getHyperParameters()) {
+            List<ParameterTypeDistribution> parameterTypes = getParameterTypeDistributionList(parameter);
+            int count = 0;
+
+            for (ParameterTypeDistribution parameterType : parameterTypes) {
+                sb.append("INSERT INTO parameter_type_definition(parameter_id, parameter_type_id, parameter_distribution_type_id, ordering) VALUES ((select id from parameter where name='")
+                        .append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("')), (select id from parameter_type where name='").append(parameterType.getParameterType()).append("'), ")
+                        .append("(select id from parameter_distribution_type where name='").append(parameterType.getParameterDistribution()).append("'), ").append(count).append(");\n");
+                count++;
+
+
+            }
+        }
+        return sb.toString();
+    }
+
+    private static String buildInsertRestParameterTablesSQL(Model model) {
+        StringBuilder sb = new StringBuilder();
+        for (HyperParameter parameter : model.getHyperParameters()) {
+            List<ParameterTypeDistribution> parameterTypes = getParameterTypeDistributionList(parameter);
+
+            Object defaultValue = parameter.getDefaultValue();
+            for (ParameterTypeDistribution parameterType : parameterTypes) {
+
+                if (parameterType.getParameterType().equals("categorical")) {
+                    String strDefaultValue = null;
+                    if(defaultValue instanceof String) {
+                        strDefaultValue = (String) defaultValue;
+                    }
+                    sb.append("INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(strDefaultValue).append("');\n");
+                }
+                if (parameterType.getParameterType().equals("float")){
+                    Float floatDefaultValue = null;
+                    if(defaultValue instanceof Float ) {
+                        floatDefaultValue = (Float) defaultValue;
+                    } else if(defaultValue instanceof Double) {
+                        floatDefaultValue = ((Double) defaultValue).floatValue();
+                    }
+                    sb.append("INSERT INTO float_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(floatDefaultValue).append(");\n");
+                }
+                if (parameterType.getParameterType().equals("integer")){
+                    Integer intDefaultValue = null;
+                    if(defaultValue instanceof Integer) {
+                        intDefaultValue = (Integer) defaultValue;
+                    }
+                    sb.append("INSERT INTO integer_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(intDefaultValue).append(");\n");
+                }
+                if (parameterType.getParameterType().equals("boolean")){
+                    Boolean boolDefaultValue = null;
+                    if(defaultValue instanceof Boolean) {
+                        boolDefaultValue = (Boolean) defaultValue;
+                    }
+                    sb.append("INSERT INTO boolean_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(boolDefaultValue).append(");\n");
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+
+    private static String buildInsertIntoIncompatibleMetricSQL(Model model) {
         StringBuilder sb = new StringBuilder();
         for (String metric : model.getIncompatibleMetrics()) {
             sb.append("INSERT INTO incompatible_metric(model_id, metric_id) VALUES ((select id from model where name='")
-                    .append(name).append("'), (select id from metric where name='").append(metric).append("'));\n");
+                    .append(model.getName()).append("'), (select id from metric where name='").append(metric).append("'));\n");
         }
         return sb.toString();
     }
@@ -245,25 +329,25 @@ public class CreateInsertScripts {
         metadata.setModelDescription(modelDescription);
     }
 
-    private static String buildInsertIntoModelSQL(String name, String mlTask, Metadata metadata, boolean isBlackListed) {
+    private static String buildInsertIntoModelSQL(Model model) {
         StringBuilder sb = new StringBuilder();
 
-        String advantagesArray = "{" + String.join(",", metadata.getAdvantages()) + "}";
-        String disadvantagesArray = "{" + String.join(",", metadata.getDisadvantages()) + "}";
+        String advantagesArray = "{" + String.join(",", model.getMetadata().getAdvantages()) + "}";
+        String disadvantagesArray = "{" + String.join(",", model.getMetadata().getDisadvantages()) + "}";
 
         sb.append("INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, model_type_id) VALUES ('").
-                append(name).append("', ").
+                append(model.getName()).append("', ").
                 append("(select id from ml_task where name='").
-                append(mlTask).append("'),'").
-                append(metadata.getModelDescription()).append("', '").
-                append(metadata.getDisplayName()).append("', ").
+                append(model.getMlTask()).append("'),'").
+                append(model.getMetadata().getModelDescription()).append("', '").
+                append(model.getMetadata().getDisplayName()).append("', ").
                 append("(select id from model_structure_type where name='").
-                append(metadata.getStructure()).append("'), '").
+                append(model.getMetadata().getStructure()).append("'), '").
                 append(advantagesArray).append("', '").
                 append(disadvantagesArray).append("',").
-                append(isBlackListed).append(",").
+                append(model.isBlackListed()).append(",").
                 append("(select id from model_type where name='").
-                append(metadata.getModelType().get(0)).append("'));\n");
+                append(model.getMetadata().getModelType().get(0)).append("'));\n");
 
         return sb.toString();
     }
@@ -294,10 +378,10 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String buildInsertIntoParameterAndParameterValueSQL(String name, String mlTask, Model model, Metadata metadata) {
+    private static String buildInsertIntoParameterAndParameterValueSQL(Model model) {
         StringBuilder sb = new StringBuilder();
 
-        List<String> prime = Optional.ofNullable(metadata.getPrime()).orElse(Collections.emptyList());
+        List<String> prime = Optional.ofNullable(model.getMetadata().getPrime()).orElse(Collections.emptyList());
 
         List<HyperParameter> parametersInPrime = new ArrayList<>();
         List<HyperParameter> parametersNotInPrime = new ArrayList<>();
@@ -314,18 +398,18 @@ public class CreateInsertScripts {
         orderedParameters.addAll(parametersInPrime);
         orderedParameters.addAll(parametersNotInPrime);
 
-        sb.append(insertIntoParameterAndParameterValue(orderedParameters, name, mlTask));
+        sb.append(insertIntoParameterAndParameterValue(orderedParameters, model.getName()));
 
         return sb.toString();
     }
 
-    private static String insertIntoParameterAndParameterValue(List<HyperParameter> orderedParameters, String name, String mlTask) {
+    private static String insertIntoParameterAndParameterValue(List<HyperParameter> orderedParameters, String name) {
         StringBuilder sb = new StringBuilder();
         int count = 0;
         for (HyperParameter parameter : orderedParameters) {
             String description = parameter.getDescription().replace("'", "''");
             count++;
-            sb.append(insertParameterSQL(parameter, description, count, name, mlTask));
+            sb.append(insertParameterSQL(parameter, description, count, name));
 //
 //            for (String value : parameter.getValues()) {
 //                value = value.replace("'", "''");
@@ -335,19 +419,16 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String insertParameterSQL(HyperParameter parameter, String description, int count, String name, String mlTask) {
-        return new StringBuilder("INSERT INTO Parameter(parameterType, name, defaultValue, label, description, enabled, hasConstraint, constraintInformation, fixedValue, ordering, modelId) VALUES ('")
-//                .append(parameter.getParameterType()).append("', '")
+    private static String insertParameterSQL(HyperParameter parameter, String description, int count, String name) {
+        return new StringBuilder("INSERT INTO parameter(name, label, description, enabled, fixed_value, ordering, model_id) VALUES ('")
                 .append(parameter.getName()).append("', '")
-                .append(parameter.getDefaultValue()).append("',")
-                .append("'").append(parameter.getLabel()).append("',")
+                .append(parameter.getLabel()).append("',")
                 .append("'").append(description).append("',")
                 .append(parameter.getEnabled()).append(",")
-                .append(parameter.getConstraint()).append(",")
-                .append("'").append(parameter.getConstraintInformation()).append("',")
-//                .append(parameter.isFixedValue()).append(",")
+                .append(parameter.isFixedValue()).append(",")
                 .append(count).append(",")
-                .append("(select id from Model where name='").append(name).append("' and mlTask='").append(mlTask).append("'));\n")
+                .append("(select id from Model where name='").append(name)
+                .append("'));\n")
                 .toString();
     }
 
@@ -357,7 +438,7 @@ public class CreateInsertScripts {
                 .toString();
     }
 
-    private static String buildInsertIntoModelMetadataSQL(String name, String mlTask, Model model, List<EnsembleFamily> ensembleFamilies, Metadata metadata) {
+    private static String buildInsertIntoModelMetadataSQL(Model model, List<EnsembleFamily> ensembleFamilies) {
         StringBuilder sb = new StringBuilder();
         EnsembleFamily matchingFamily = null;
         for (EnsembleFamily family : ensembleFamilies) {
@@ -369,8 +450,8 @@ public class CreateInsertScripts {
 
         if (matchingFamily != null) {
             sb.append("INSERT INTO model_metadata(model_id, decision_tree, ensemble_type, family) VALUES ((select id from model where name='")
-                    .append(name).append("'),")
-                    .append(metadata.getSupports().getDecisionTree()).append(",'")
+                    .append(model.getName()).append("'),")
+                    .append(model.getMetadata().getSupports().getDecisionTree()).append(",'")
                     .append(matchingFamily.getEnsembleType()).append("','")
                     .append(matchingFamily.getFamily()).append("');\n");
         }
@@ -378,3 +459,4 @@ public class CreateInsertScripts {
     }
 
 }
+
