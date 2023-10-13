@@ -242,7 +242,7 @@ public class CreateInsertScripts {
         sb.append(buildInsertIntoModelSQL(model, ensembleFamilies));
         sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
         sb.append(buildInsertIntoParameterAndParameterValueSQL(model));
-        sb.append(buildInsertIntoModelMetadataSQL(model, ensembleFamilies));
+//        sb.append(buildInsertIntoModelMetadataSQL(model, ensembleFamilies));
         sb.append(buildInsertIntoIncompatibleMetricSQL(model));
         sb.append(buildInsertIntoParameterTypeDefinitionSQL(model));
         sb.append(buildInsertRestParameterTablesSQL(model));
@@ -259,15 +259,72 @@ public class CreateInsertScripts {
                         .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))")
                         .append(");\n");
 
-                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES ('")
+                UUID mappingSourceUuid = UUID.randomUUID();
+                UUID mappingTargetUuid = UUID.randomUUID();
+                sb.append("INSERT INTO mapping(id,constraint_id,parameter_type_definition_id) VALUES ('")
+                        .append(mappingSourceUuid).append("','")
                         .append(uuid).append("',")
                         .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '").append(getParameterType(item.getSource())).append("'))")
                         .append(");\n");
 
-                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES ('")
+                sb.append("INSERT INTO mapping(id,constraint_id,parameter_type_definition_id) VALUES ('")
+                        .append(mappingTargetUuid).append("','")
                         .append(uuid).append("',")
                         .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '").append(getParameterType(item.getTarget())).append("'))")
                         .append(");\n");
+
+                if (getParameterType(item.getSource()).equals("categorical")) {
+                    for (Object value : item.getSource().getCategoricalSet().getCategories()) {
+                        sb.append("INSERT INTO categorical_constraint_value(mapping_id,value) VALUES ('")
+                                .append(mappingSourceUuid).append("','").append(value).append("');\n");
+                    }
+                }
+                if (getParameterType(item.getTarget()).equals("categorical")) {
+                    for (Object value : item.getTarget().getCategoricalSet().getCategories()) {
+                        sb.append("INSERT INTO categorical_constraint_value(mapping_id,value) VALUES ('")
+                                .append(mappingTargetUuid).append("','").append(value).append("');\n");
+                    }
+                }
+                if (getParameterType(item.getSource()).equals("integer")) {
+                    for (Range range : item.getSource().getIntegerSet().getRanges()) {
+                        sb.append("INSERT INTO integer_constraint_range(mapping_id,lower,upper) VALUES ('")
+                                .append(mappingSourceUuid).append("',").append(range.getStart()).append(",").append(range.getStop()).append(");\n");
+                    }
+                }
+                if (getParameterType(item.getTarget()).equals("integer")) {
+                    for (Range range : item.getTarget().getIntegerSet().getRanges()) {
+                        sb.append("INSERT INTO integer_constraint_range(mapping_id,lower,upper) VALUES ('")
+                                .append(mappingTargetUuid).append("',").append(range.getStart()).append(",").append(range.getStop()).append(");\n");
+                    }
+                }
+                if (getParameterType(item.getSource()).equals("float")) {
+                    for (Interval interval : item.getSource().getFloatSet().getIntervals()) {
+                        sb.append("INSERT INTO float_constraint_range(mapping_id,is_left_open,is_right_open,lower,upper) VALUES ('")
+                                .append(mappingSourceUuid).append("',").append(interval.getLeft()).append(",")
+                                .append(interval.getRight()).append(",").append(interval.getLower()).append(",")
+                                .append(interval.getUpper()).append(");\n");
+                    }
+                }
+                if (getParameterType(item.getTarget()).equals("float")) {
+                    for (Interval interval : item.getTarget().getFloatSet().getIntervals()) {
+                        sb.append("INSERT INTO float_constraint_range(mapping_id,is_left_open,is_right_open,lower,upper) VALUES ('")
+                                .append(mappingTargetUuid).append("',").append(interval.getLeft()).append(",")
+                                .append(interval.getRight()).append(",").append(interval.getLower()).append(",")
+                                .append(interval.getUpper()).append(");\n");
+                    }
+                }
+                if (getParameterType(item.getSource()).equals("boolean")) {
+                    for (Object value : item.getSource().getCategoricalSet().getCategories()) {
+                        sb.append("INSERT INTO boolean_constraint_value(mapping_id,value) VALUES ('")
+                                .append(mappingSourceUuid).append("',").append(value).append(");\n");
+                    }
+                }
+                if (getParameterType(item.getTarget()).equals("boolean")) {
+                    for (Object value : item.getTarget().getCategoricalSet().getCategories()) {
+                        sb.append("INSERT INTO boolean_constraint_value(mapping_id,value) VALUES ('")
+                                .append(mappingTargetUuid).append("',").append(value).append(");\n");
+                    }
+                }
             }
         }
         return sb.toString();
@@ -342,7 +399,7 @@ public class CreateInsertScripts {
 
                 if (parameterType.getParameterType().equals("categorical")) {
                     String strDefaultValue = null;
-                    if(defaultValue instanceof String) {
+                    if (defaultValue instanceof String) {
                         strDefaultValue = (String) defaultValue;
                     }
                     sb.append("INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(strDefaultValue).append("');\n");
@@ -350,11 +407,11 @@ public class CreateInsertScripts {
                         sb.append("INSERT INTO categorical_parameter_value(parameter_type_definition_id, value ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(value).append("');\n");
                     }
                 }
-                if (parameterType.getParameterType().equals("float")){
+                if (parameterType.getParameterType().equals("float")) {
                     Float floatDefaultValue = null;
-                    if(defaultValue instanceof Float ) {
+                    if (defaultValue instanceof Float) {
                         floatDefaultValue = (Float) defaultValue;
-                    } else if(defaultValue instanceof Double) {
+                    } else if (defaultValue instanceof Double) {
                         floatDefaultValue = ((Double) defaultValue).floatValue();
                     }
                     sb.append("INSERT INTO float_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(floatDefaultValue).append(");\n");
@@ -362,9 +419,9 @@ public class CreateInsertScripts {
                         sb.append("INSERT INTO float_parameter_range(parameter_type_definition_id, is_left_open, is_right_open, lower, upper ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(interval.getLeft()).append(", ").append(interval.getRight()).append(", ").append(interval.getLower()).append(", ").append(interval.getUpper()).append(");\n");
                     }
                 }
-                if (parameterType.getParameterType().equals("integer")){
+                if (parameterType.getParameterType().equals("integer")) {
                     Integer intDefaultValue = null;
-                    if(defaultValue instanceof Integer) {
+                    if (defaultValue instanceof Integer) {
                         intDefaultValue = (Integer) defaultValue;
                     }
                     sb.append("INSERT INTO integer_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(intDefaultValue).append(");\n");
@@ -372,9 +429,9 @@ public class CreateInsertScripts {
                         sb.append("INSERT INTO integer_parameter_range(parameter_type_definition_id, start, stop ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(range.getStart()).append(", ").append(range.getStop()).append(");\n");
                     }
                 }
-                if (parameterType.getParameterType().equals("boolean")){
+                if (parameterType.getParameterType().equals("boolean")) {
                     Boolean boolDefaultValue = null;
-                    if(defaultValue instanceof Boolean) {
+                    if (defaultValue instanceof Boolean) {
                         boolDefaultValue = (Boolean) defaultValue;
                     }
                     sb.append("INSERT INTO boolean_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ").append(boolDefaultValue).append(");\n");
@@ -409,14 +466,14 @@ public class CreateInsertScripts {
         metadata.setModelDescription(modelDescription);
     }
 
-    private static String buildInsertIntoModelSQL(Model model,List<EnsembleFamily> ensembleFamilies) {
+    private static String buildInsertIntoModelSQL(Model model, List<EnsembleFamily> ensembleFamilies) {
         StringBuilder sb = new StringBuilder();
 
         String advantagesArray = "{" + String.join(",", model.getMetadata().getAdvantages()) + "}";
         String disadvantagesArray = "{" + String.join(",", model.getMetadata().getDisadvantages()) + "}";
 
-        String ensembleType =null;
-        String familyType =null;
+        String ensembleType = null;
+        String familyType = null;
         for (EnsembleFamily ensembleFamily : ensembleFamilies) {
             if (ensembleFamily.getName().equals(model.getName())) {
                 ensembleType = ensembleFamily.getEnsembleType();
@@ -514,25 +571,25 @@ public class CreateInsertScripts {
                 .toString();
     }
 
-    private static String buildInsertIntoModelMetadataSQL(Model model, List<EnsembleFamily> ensembleFamilies) {
-        StringBuilder sb = new StringBuilder();
-        EnsembleFamily matchingFamily = null;
-        for (EnsembleFamily family : ensembleFamilies) {
-            if (family.getName().equals(model.getName())) {
-                matchingFamily = family;
-                break;
-            }
-        }
-
-        if (matchingFamily != null) {
-            sb.append("INSERT INTO model_metadata(model_id, decision_tree, ensemble_type, family) VALUES ((select id from model where name='")
-                    .append(model.getName()).append("'),")
-                    .append(model.getMetadata().getSupports().getDecisionTree()).append(",'")
-                    .append(matchingFamily.getEnsembleType()).append("','")
-                    .append(matchingFamily.getFamily()).append("');\n");
-        }
-        return sb.toString();
-    }
+//    private static String buildInsertIntoModelMetadataSQL(Model model, List<EnsembleFamily> ensembleFamilies) {
+//        StringBuilder sb = new StringBuilder();
+//        EnsembleFamily matchingFamily = null;
+//        for (EnsembleFamily family : ensembleFamilies) {
+//            if (family.getName().equals(model.getName())) {
+//                matchingFamily = family;
+//                break;
+//            }
+//        }
+//
+//        if (matchingFamily != null) {
+//            sb.append("INSERT INTO model_metadata(model_id, decision_tree, ensemble_type, family) VALUES ((select id from model where name='")
+//                    .append(model.getName()).append("'),")
+//                    .append(model.getMetadata().getSupports().getDecisionTree()).append(",'")
+//                    .append(matchingFamily.getEnsembleType()).append("','")
+//                    .append(matchingFamily.getFamily()).append("');\n");
+//        }
+//        return sb.toString();
+//    }
 
 }
 

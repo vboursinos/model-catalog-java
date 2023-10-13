@@ -65,8 +65,8 @@ public class CreateTableSqlScript {
                 "  advantages text[],\n" +
                 "  disadvantages text[],\n" +
                 "  enabled boolean NOT NULL,\n" +
-                "  ensemble_type_id uuid REFERENCES ensemble_type (id) NOT NULL,\n" +
-                "  family_type_id uuid REFERENCES family_type (id) NOT NULL,\n" +
+                "  ensemble_type_id uuid REFERENCES ensemble_type (id),\n" +
+                "  family_type_id uuid REFERENCES family_type (id),\n" +
                 "  decision_tree boolean NOT NULL\n" +
                 ");\n" +
                 "\n" +
@@ -168,7 +168,7 @@ public class CreateTableSqlScript {
                 "  parameter_type_definition_id uuid REFERENCES parameter_type_definition (id) NOT NULL\n" +
                 ");\n" +
                 "\n" +
-                "CREATE TABLE float_contraint_range (\n" +
+                "CREATE TABLE float_constraint_range (\n" +
                 "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
                 "  mapping_id uuid REFERENCES mapping (id) NOT NULL,\n" +
                 "  is_left_open boolean NOT NULL,\n" +
