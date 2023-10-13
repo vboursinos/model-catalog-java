@@ -226,19 +226,21 @@ public class CreateInsertScripts {
     private static String buildInsertConstraintSQL(Model model) {
         StringBuilder sb = new StringBuilder();
         for (ConstraintEdge constraint : model.getConstraintEdges()) {
-            sb.append("INSERT INTO constraint_edge(source_parameter_id,target_parameter_id) VALUES (")
-                    .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')),")
-                    .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))")
-                    .append(");\n");
             for (Item item : constraint.getMapping()) {
-                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES (")
-                        .append("(SELECT id FROM constraint_edge WHERE source_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) AND target_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))),")
-                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')))")
+                UUID uuid = UUID.randomUUID();
+                sb.append("INSERT INTO constraint_edge(id, source_parameter_id,target_parameter_id) VALUES ('").append(uuid).append("',")
+                        .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')),")
+                        .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))")
                         .append(");\n");
 
-                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES (")
-                        .append("(SELECT id FROM constraint_edge WHERE source_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) AND target_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))),")
-                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')))")
+                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES ('")
+                        .append(uuid).append("',")
+                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '").append(getParameterType(item.getSource())).append("'))")
+                        .append(");\n");
+
+                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES ('")
+                        .append(uuid).append("',")
+                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '").append(getParameterType(item.getTarget())).append("'))")
                         .append(");\n");
             }
         }
@@ -263,6 +265,26 @@ public class CreateInsertScripts {
             parameterTypes.add(new ParameterTypeDistribution("integer", parameter.getDistribution().getIntegerDistribution()));
         }
         return parameterTypes;
+    }
+
+    private static String getParameterType(Domain domain) {
+        String parameterType = null;
+        if (domain.getCategoricalSet() != null && !domain.getCategoricalSet().getCategories().isEmpty()) {
+            if (domain.getCategoricalSet().getCategories().contains("True") || domain.getCategoricalSet().getCategories().contains("False")) {
+                parameterType = "boolean";
+            } else {
+                parameterType = "categorical";
+            }
+        }
+
+        if (domain.getFloatSet() != null && !domain.getFloatSet().getIntervals().isEmpty()) {
+            parameterType = "float";
+        }
+
+        if (domain.getIntegerSet() != null && !domain.getIntegerSet().getRanges().isEmpty()) {
+            parameterType = "integer";
+        }
+        return parameterType;
     }
 
     private static String buildInsertIntoParameterTypeDefinitionSQL(Model model) {
