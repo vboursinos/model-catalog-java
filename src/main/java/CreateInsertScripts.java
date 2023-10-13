@@ -324,7 +324,6 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    // Helper method for 'float' type.
     private static String buildFloatConstraintRangeQuery(Domain domain, UUID uuid) {
         StringBuilder sb = new StringBuilder();
         for (Interval interval : domain.getFloatSet().getIntervals()) {
@@ -334,7 +333,6 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    // Helper method for 'boolean' type
     private static String buildBooleanConstraintValueQuery(Domain domain, UUID uuid) {
         StringBuilder sb = new StringBuilder();
         for (Object value : domain.getCategoricalSet().getCategories()) {
@@ -416,7 +414,13 @@ public class CreateInsertScripts {
                     if (defaultValue instanceof String) {
                         strDefaultValue = (String) defaultValue;
                     }
-                    sb.append("INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(strDefaultValue).append("');\n");
+                    sb.append("INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), ");
+                    if (strDefaultValue != null) {
+                        sb.append("'").append(strDefaultValue).append("'");
+                    } else {
+                        sb.append(strDefaultValue);
+                    }
+                    sb.append(");\n");
                     for (Object value : parameter.getDomain().getCategoricalSet().getCategories()) {
                         sb.append("INSERT INTO categorical_parameter_value(parameter_type_definition_id, value ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='").append(parameter.getName()).append("'  and model_id=(select id from model where name='").append(model.getName()).append("') and parameter_type_id=(select id from parameter_type where name='").append(parameterType.getParameterType()).append("'))), '").append(value).append("');\n");
                     }
