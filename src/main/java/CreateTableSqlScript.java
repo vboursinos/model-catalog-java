@@ -75,13 +75,6 @@ public class CreateTableSqlScript {
                 "  group_id uuid REFERENCES group_type (id)\n" +
                 ");\n" +
                 "\n" +
-                "CREATE TABLE model_metadata (\n" +
-                "  model_id uuid REFERENCES model (id),\n" +
-                "  decision_tree varchar,\n" +
-                "  ensemble_type varchar,\n" +
-                "  family varchar\n" +
-                ");\n" +
-                "\n" +
                 "CREATE TABLE metric (\n" +
                 "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
                 "  name varchar NOT NULL UNIQUE\n" +
