@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ public class CreateInsertScripts {
         createSQLFile("insert_model_structure_type.sql", buildInsertModelStructureTypeSQL(allModelStructureTypes));
         createSQLFile("insert_ml_task.sql", buildInsertMlTaskSQL(allMlTasks));
         createSQLFile("insert_metrics.sql", buildMetricSQL(allMetrics));
+        createSQLFile("insert_ensemble_family.sql", buildInsertEnsembleFamilyTypeSQL());
 
         logger.info(allModelTypes.toString());
         processModelsInDirectory(mapper, dirPath, this::createModelSqlFile);
@@ -149,6 +151,30 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
+    static String buildInsertEnsembleFamilyTypeSQL() {
+        String filePath = Paths.get("static", "ensemble-family.json").toString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        StringBuilder sb = new StringBuilder();
+        try {
+            List<EnsembleFamily> modelList = objectMapper.readValue(new File(filePath), new TypeReference<List<EnsembleFamily>>() {});
+            Set<String> ensembleTypes = new HashSet<>();
+            Set<String> familyTypes = new HashSet<>();
+            for (EnsembleFamily model : modelList) {
+                ensembleTypes.add(model.getEnsembleType());
+                familyTypes.add(model.getFamily());
+            }
+            for (String ensembleType : ensembleTypes) {
+                sb.append("INSERT INTO ensemble_type(name) VALUES ('").append(ensembleType).append("');\n");
+            }
+            for (String familyType : familyTypes) {
+                sb.append("INSERT INTO family_type(name) VALUES ('").append(familyType).append("');\n");
+            }
+        } catch (IOException e) {
+            logger.error("Error reading ensemble-family.json file: " + e.getMessage(), e);
+        }
+        return sb.toString();
+    }
+
     static String buildInsertGroupTypeSQL() {
         StringBuilder sb = new StringBuilder();
         Properties properties = PropertiesConfig.getProperties();
@@ -213,7 +239,7 @@ public class CreateInsertScripts {
         Metadata metadata = model.getMetadata();
         replaceSingleQuotesInMetadata(metadata);
 
-        sb.append(buildInsertIntoModelSQL(model));
+        sb.append(buildInsertIntoModelSQL(model, ensembleFamilies));
         sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
         sb.append(buildInsertIntoParameterAndParameterValueSQL(model));
         sb.append(buildInsertIntoModelMetadataSQL(model, ensembleFamilies));
@@ -383,13 +409,23 @@ public class CreateInsertScripts {
         metadata.setModelDescription(modelDescription);
     }
 
-    private static String buildInsertIntoModelSQL(Model model) {
+    private static String buildInsertIntoModelSQL(Model model,List<EnsembleFamily> ensembleFamilies) {
         StringBuilder sb = new StringBuilder();
 
         String advantagesArray = "{" + String.join(",", model.getMetadata().getAdvantages()) + "}";
         String disadvantagesArray = "{" + String.join(",", model.getMetadata().getDisadvantages()) + "}";
 
-        sb.append("INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, model_type_id) VALUES ('").
+        String ensembleType =null;
+        String familyType =null;
+        for (EnsembleFamily ensembleFamily : ensembleFamilies) {
+            if (ensembleFamily.getName().equals(model.getName())) {
+                ensembleType = ensembleFamily.getEnsembleType();
+                familyType = ensembleFamily.getFamily();
+                break;
+            }
+        }
+
+        sb.append("INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, ensemble_type_id, family_type_id, decision_tree, model_type_id) VALUES ('").
                 append(model.getName()).append("', ").
                 append("(select id from ml_task where name='").
                 append(model.getMlTask()).append("'),'").
@@ -400,6 +436,10 @@ public class CreateInsertScripts {
                 append(advantagesArray).append("', '").
                 append(disadvantagesArray).append("',").
                 append(model.isBlackListed()).append(",").
+                append("(select id from ensemble_type where name='").
+                append(ensembleType).append("'),(select id from family_type where name='").
+                append(familyType).append("'),").
+                append(model.getMetadata().getSupports().getDecisionTree()).append(",").
                 append("(select id from model_type where name='").
                 append(model.getMetadata().getModelType().get(0)).append("'));\n");
 
