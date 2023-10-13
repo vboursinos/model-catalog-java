@@ -44,6 +44,16 @@ public class CreateTableSqlScript {
                 "  name varchar NOT NULL\n" +
                 ");\n" +
                 "\n" +
+                "CREATE TABLE ensemble_type (\n" +
+                "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
+                "  name varchar NOT NULL\n" +
+                ");\n" +
+                "\n" +
+                "CREATE TABLE family_type (\n" +
+                "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
+                "  name varchar NOT NULL\n" +
+                ");\n" +
+                "\n" +
                 "CREATE TABLE model (\n" +
                 "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
                 "  model_type_id uuid REFERENCES model_type (id),\n" +
@@ -54,13 +64,10 @@ public class CreateTableSqlScript {
                 "  description varchar,\n" +
                 "  advantages text[],\n" +
                 "  disadvantages text[],\n" +
-                "  enabled boolean NOT NULL\n" +
-                ");\n" +
-                "\n" +
-                "CREATE TABLE model_dependency (\n" +
-                "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
-                "  model_id uuid REFERENCES model (id),\n" +
-                "  name varchar NOT NULL\n" +
+                "  enabled boolean NOT NULL,\n" +
+                "  ensemble_type_id uuid REFERENCES ensemble_type (id) NOT NULL,\n" +
+                "  family_type_id uuid REFERENCES family_type (id) NOT NULL,\n" +
+                "  decision_tree boolean NOT NULL\n" +
                 ");\n" +
                 "\n" +
                 "CREATE TABLE model_group (\n" +
