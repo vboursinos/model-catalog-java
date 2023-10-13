@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
         "floatSet",
         "integerSet",
-        "categoricaSet",
+        "categoricalSet",
 })
 public class Domain {
     @JsonProperty("floatSet")
