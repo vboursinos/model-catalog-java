@@ -252,78 +252,94 @@ public class CreateInsertScripts {
         for (ConstraintEdge constraint : model.getConstraintEdges()) {
             for (Item item : constraint.getMapping()) {
                 UUID uuid = UUID.randomUUID();
-                sb.append("INSERT INTO constraint_edge(id, source_parameter_id,target_parameter_id) VALUES ('").append(uuid).append("',")
-                        .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')),")
-                        .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))")
-                        .append(");\n");
-
+                sb.append(buildInsertConstraintEdgeQuery(uuid, constraint, model));
                 UUID mappingSourceUuid = UUID.randomUUID();
                 UUID mappingTargetUuid = UUID.randomUUID();
-                sb.append("INSERT INTO mapping(id,constraint_id,parameter_type_definition_id) VALUES ('")
-                        .append(mappingSourceUuid).append("','")
-                        .append(uuid).append("',")
-                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '").append(getParameterType(item.getSource())).append("'))")
-                        .append(");\n");
-
-                sb.append("INSERT INTO mapping(id,constraint_id,parameter_type_definition_id) VALUES ('")
-                        .append(mappingTargetUuid).append("','")
-                        .append(uuid).append("',")
-                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '").append(getParameterType(item.getTarget())).append("'))")
-                        .append(");\n");
-
-                if (getParameterType(item.getSource()).equals("categorical")) {
-                    for (Object value : item.getSource().getCategoricalSet().getCategories()) {
-                        sb.append("INSERT INTO categorical_constraint_value(mapping_id,value) VALUES ('")
-                                .append(mappingSourceUuid).append("','").append(value).append("');\n");
-                    }
-                }
-                if (getParameterType(item.getTarget()).equals("categorical")) {
-                    for (Object value : item.getTarget().getCategoricalSet().getCategories()) {
-                        sb.append("INSERT INTO categorical_constraint_value(mapping_id,value) VALUES ('")
-                                .append(mappingTargetUuid).append("','").append(value).append("');\n");
-                    }
-                }
-                if (getParameterType(item.getSource()).equals("integer")) {
-                    for (Range range : item.getSource().getIntegerSet().getRanges()) {
-                        sb.append("INSERT INTO integer_constraint_range(mapping_id,lower,upper) VALUES ('")
-                                .append(mappingSourceUuid).append("',").append(range.getStart()).append(",").append(range.getStop()).append(");\n");
-                    }
-                }
-                if (getParameterType(item.getTarget()).equals("integer")) {
-                    for (Range range : item.getTarget().getIntegerSet().getRanges()) {
-                        sb.append("INSERT INTO integer_constraint_range(mapping_id,lower,upper) VALUES ('")
-                                .append(mappingTargetUuid).append("',").append(range.getStart()).append(",").append(range.getStop()).append(");\n");
-                    }
-                }
-                if (getParameterType(item.getSource()).equals("float")) {
-                    for (Interval interval : item.getSource().getFloatSet().getIntervals()) {
-                        sb.append("INSERT INTO float_constraint_range(mapping_id,is_left_open,is_right_open,lower,upper) VALUES ('")
-                                .append(mappingSourceUuid).append("',").append(interval.getLeft()).append(",")
-                                .append(interval.getRight()).append(",").append(interval.getLower()).append(",")
-                                .append(interval.getUpper()).append(");\n");
-                    }
-                }
-                if (getParameterType(item.getTarget()).equals("float")) {
-                    for (Interval interval : item.getTarget().getFloatSet().getIntervals()) {
-                        sb.append("INSERT INTO float_constraint_range(mapping_id,is_left_open,is_right_open,lower,upper) VALUES ('")
-                                .append(mappingTargetUuid).append("',").append(interval.getLeft()).append(",")
-                                .append(interval.getRight()).append(",").append(interval.getLower()).append(",")
-                                .append(interval.getUpper()).append(");\n");
-                    }
-                }
-                if (getParameterType(item.getSource()).equals("boolean")) {
-                    for (Object value : item.getSource().getCategoricalSet().getCategories()) {
-                        sb.append("INSERT INTO boolean_constraint_value(mapping_id,value) VALUES ('")
-                                .append(mappingSourceUuid).append("',").append(value).append(");\n");
-                    }
-                }
-                if (getParameterType(item.getTarget()).equals("boolean")) {
-                    for (Object value : item.getTarget().getCategoricalSet().getCategories()) {
-                        sb.append("INSERT INTO boolean_constraint_value(mapping_id,value) VALUES ('")
-                                .append(mappingTargetUuid).append("',").append(value).append(");\n");
-                    }
-                }
+                sb.append(buildInsertMappingQuery(mappingSourceUuid, uuid, constraint.getSource(), item.getSource(), model));
+                sb.append(buildInsertMappingQuery(mappingTargetUuid, uuid, constraint.getTarget(), item.getTarget(), model));
+                sb.append(generateConstraintValueQuery(item, mappingSourceUuid, mappingTargetUuid));
             }
+        }
+        return sb.toString();
+    }
+
+    private static String buildInsertConstraintEdgeQuery(UUID uuid, ConstraintEdge constraint, Model model) {
+        return String.format("INSERT INTO constraint_edge(id, source_parameter_id,target_parameter_id) VALUES ('%s'," +
+                        "(SELECT id FROM parameter WHERE name = '%s' AND model_id = (SELECT id FROM model WHERE name = '%s'))," +
+                        "(SELECT id FROM parameter WHERE name = '%s' AND model_id = (SELECT id FROM model WHERE name = '%s')));",
+                uuid, constraint.getSource(), model.getName(), constraint.getTarget(), model.getName());
+    }
+
+    private static String buildInsertMappingQuery(UUID uuid, UUID constraintUuid, String constraintParam, Domain domain, Model model) {
+        return String.format("INSERT INTO mapping(id,constraint_id,parameter_type_definition_id) VALUES ('%s','%s'," +
+                        "(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '%s' AND model_id = (SELECT id FROM model WHERE name = '%s')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '%s')));",
+                uuid, constraintUuid, constraintParam, model.getName(), getParameterType(domain));
+    }
+
+    private static String generateConstraintValueQuery(Item item, UUID mappingSourceUuid, UUID mappingTargetUuid) {
+        StringBuilder sb = new StringBuilder();
+        String sourceType = getParameterType(item.getSource());
+        String targetType = getParameterType(item.getTarget());
+        if ("categorical".equals(sourceType)) {
+            sb.append(buildCategoricalConstraintValueQuery(item.getSource(), mappingSourceUuid));
+        }
+        if ("categorical".equals(targetType)) {
+            sb.append(buildCategoricalConstraintValueQuery(item.getTarget(), mappingTargetUuid));
+        }
+        if ("integer".equals(sourceType)) {
+            sb.append(buildIntegerConstraintRangeQuery(item.getSource(), mappingSourceUuid));
+        }
+        if ("integer".equals(targetType)) {
+            sb.append(buildIntegerConstraintRangeQuery(item.getTarget(), mappingTargetUuid));
+        }
+        if ("float".equals(sourceType)) {
+            sb.append(buildFloatConstraintRangeQuery(item.getSource(), mappingSourceUuid));
+        }
+        if ("float".equals(targetType)) {
+            sb.append(buildFloatConstraintRangeQuery(item.getTarget(), mappingTargetUuid));
+        }
+        if ("boolean".equals(sourceType)) {
+            sb.append(buildBooleanConstraintValueQuery(item.getSource(), mappingSourceUuid));
+        }
+        if ("boolean".equals(targetType)) {
+            sb.append(buildBooleanConstraintValueQuery(item.getTarget(), mappingTargetUuid));
+        }
+        return sb.toString();
+    }
+
+    private static String buildCategoricalConstraintValueQuery(Domain domain, UUID uuid) {
+        StringBuilder sb = new StringBuilder();
+        for (Object value : domain.getCategoricalSet().getCategories()) {
+            sb.append(String.format("INSERT INTO categorical_constraint_value(mapping_id,value) VALUES ('%s','%s');", uuid, value));
+        }
+        return sb.toString();
+    }
+
+    private static String buildIntegerConstraintRangeQuery(Domain domain, UUID uuid) {
+        StringBuilder sb = new StringBuilder();
+        for (Range range : domain.getIntegerSet().getRanges()) {
+            sb.append(String.format("INSERT INTO integer_constraint_range(mapping_id,lower,upper) VALUES ('%s',%d,%d);",
+                    uuid, range.getStart(), range.getStop()));
+        }
+        return sb.toString();
+    }
+
+    // Helper method for 'float' type.
+    private static String buildFloatConstraintRangeQuery(Domain domain, UUID uuid) {
+        StringBuilder sb = new StringBuilder();
+        for (Interval interval : domain.getFloatSet().getIntervals()) {
+            sb.append(String.format("INSERT INTO float_constraint_range(mapping_id,is_left_open,is_right_open,lower,upper) VALUES ('%s',%s,%s,%f,%s);",
+                    uuid, interval.getLeft(), interval.getRight(), interval.getLower(), interval.getUpper()));
+        }
+        return sb.toString();
+    }
+
+    // Helper method for 'boolean' type
+    private static String buildBooleanConstraintValueQuery(Domain domain, UUID uuid) {
+        StringBuilder sb = new StringBuilder();
+        for (Object value : domain.getCategoricalSet().getCategories()) {
+            sb.append(String.format("INSERT INTO boolean_constraint_value(mapping_id,value) VALUES ('%s',%s);",
+                    uuid, value));
         }
         return sb.toString();
     }
