@@ -235,14 +235,12 @@ public class CreateInsertScripts {
 
     private static void processModel(Model model, List<EnsembleFamily> ensembleFamilies, StringBuilder sb) {
         String name = model.getName().replace("'", "''");
-        String mlTask = model.getMlTask().replace("'", "''");
         Metadata metadata = model.getMetadata();
         replaceSingleQuotesInMetadata(metadata);
 
         sb.append(buildInsertIntoModelSQL(model, ensembleFamilies));
-        sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
+        sb.append(buildInsertIntoModelToGroupSQL(name, model.getGroups()));
         sb.append(buildInsertIntoParameterAndParameterValueSQL(model));
-//        sb.append(buildInsertIntoModelMetadataSQL(model, ensembleFamilies));
         sb.append(buildInsertIntoIncompatibleMetricSQL(model));
         sb.append(buildInsertIntoParameterTypeDefinitionSQL(model));
         sb.append(buildInsertRestParameterTablesSQL(model));
@@ -503,7 +501,7 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String buildInsertIntoModelToGroupSQL(String name, String mlTask, List<String> modelGroups) {
+    private static String buildInsertIntoModelToGroupSQL(String name, List<String> modelGroups) {
         StringBuilder sb = new StringBuilder();
 
         for (String group : modelGroups) {
@@ -564,32 +562,6 @@ public class CreateInsertScripts {
                 .append("'));\n")
                 .toString();
     }
-
-    private static String insertParameterValueSQL(String value, InputParameter parameter, String name, String mlTask) {
-        return new StringBuilder("INSERT INTO ParameterValue(value,parameterId) VALUES ('")
-                .append(value).append("',(select id from Parameter where name='").append(parameter.getParameterName()).append("' and modelId=(select id from model where name='").append(name).append("' and mlTask='").append(mlTask).append("')));\n")
-                .toString();
-    }
-
-//    private static String buildInsertIntoModelMetadataSQL(Model model, List<EnsembleFamily> ensembleFamilies) {
-//        StringBuilder sb = new StringBuilder();
-//        EnsembleFamily matchingFamily = null;
-//        for (EnsembleFamily family : ensembleFamilies) {
-//            if (family.getName().equals(model.getName())) {
-//                matchingFamily = family;
-//                break;
-//            }
-//        }
-//
-//        if (matchingFamily != null) {
-//            sb.append("INSERT INTO model_metadata(model_id, decision_tree, ensemble_type, family) VALUES ((select id from model where name='")
-//                    .append(model.getName()).append("'),")
-//                    .append(model.getMetadata().getSupports().getDecisionTree()).append(",'")
-//                    .append(matchingFamily.getEnsembleType()).append("','")
-//                    .append(matchingFamily.getFamily()).append("');\n");
-//        }
-//        return sb.toString();
-//    }
 
 }
 
