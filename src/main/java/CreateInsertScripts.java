@@ -214,14 +214,37 @@ public class CreateInsertScripts {
         replaceSingleQuotesInMetadata(metadata);
 
         sb.append(buildInsertIntoModelSQL(model));
-//        sb.append(buildInsertIntoModelDependencySQL(name, mlTask, metadata));
         sb.append(buildInsertIntoModelToGroupSQL(name, mlTask, model.getGroups()));
         sb.append(buildInsertIntoParameterAndParameterValueSQL(model));
         sb.append(buildInsertIntoModelMetadataSQL(model, ensembleFamilies));
         sb.append(buildInsertIntoIncompatibleMetricSQL(model));
         sb.append(buildInsertIntoParameterTypeDefinitionSQL(model));
         sb.append(buildInsertRestParameterTablesSQL(model));
+        sb.append(buildInsertConstraintSQL(model));
     }
+
+    private static String buildInsertConstraintSQL(Model model) {
+        StringBuilder sb = new StringBuilder();
+        for (ConstraintEdge constraint : model.getConstraintEdges()) {
+            sb.append("INSERT INTO constraint_edge(source_parameter_id,target_parameter_id) VALUES (")
+                    .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')),")
+                    .append("(SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))")
+                    .append(");\n");
+            for (Item item : constraint.getMapping()) {
+                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES (")
+                        .append("(SELECT id FROM constraint_edge WHERE source_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) AND target_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))),")
+                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')))")
+                        .append(");\n");
+
+                sb.append("INSERT INTO mapping(constraint_id,parameter_type_definition_id) VALUES (")
+                        .append("(SELECT id FROM constraint_edge WHERE source_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getSource()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')) AND target_parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("'))),")
+                        .append("(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '").append(constraint.getTarget()).append("' AND model_id = (SELECT id FROM model WHERE name = '").append(model.getName()).append("')))")
+                        .append(");\n");
+            }
+        }
+        return sb.toString();
+    }
+
 
     private static List<ParameterTypeDistribution> getParameterTypeDistributionList(HyperParameter parameter) {
         List<ParameterTypeDistribution> parameterTypes = new ArrayList<>();
@@ -361,19 +384,6 @@ public class CreateInsertScripts {
         return sb.toString();
     }
 
-    private static String buildInsertIntoModelDependencySQL(String name, String mlTask, Metadata metadata) {
-        StringBuilder sb = new StringBuilder();
-
-//        for (String dep : metadata.getDeps()) {
-//            sb.append("INSERT INTO ModelDependency(modelId, name) VALUES ((select id from Model where name='").
-//                    append(name).append("' and mlTask='").
-//                    append(mlTask).append("'),").
-//                    append("'").append(dep).
-//                    append("');\n");
-//        }
-        return sb.toString();
-    }
-
     private static String buildInsertIntoModelToGroupSQL(String name, String mlTask, List<String> modelGroups) {
         StringBuilder sb = new StringBuilder();
 
@@ -419,11 +429,6 @@ public class CreateInsertScripts {
             String description = parameter.getDescription().replace("'", "''");
             count++;
             sb.append(insertParameterSQL(parameter, description, count, name));
-//
-//            for (String value : parameter.getValues()) {
-//                value = value.replace("'", "''");
-//                sb.append(insertParameterValueSQL(value, parameter, name, mlTask));
-//            }
         }
         return sb.toString();
     }
