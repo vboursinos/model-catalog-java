@@ -1,3 +1,7 @@
+package scripts.create_tables;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import utils.FileUtils;
 
 import java.nio.file.Paths;
@@ -6,9 +10,13 @@ public class CreateTableSqlScript {
     private static final String SQL_DIR_PATH = "sql_scripts";
     private static final String SETUP_SCRIPT_NAME = "setup.sql";
 
+    private static final Logger logger = LogManager.getLogger(CreateTableSqlScript.class);
+
     public void createTablesScript() {
         String sqlScript = getSqlScript();
         FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, SETUP_SCRIPT_NAME).toString(), sqlScript);
+        logger.info("Create all db tables sql file is created successfully");
+
     }
 
     private String getSqlScript() {
