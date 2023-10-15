@@ -1,6 +1,5 @@
 package model;
 
-
 public class Item {
   private Domain source;
   private Domain target;

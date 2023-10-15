@@ -1,5 +1,9 @@
 package scripts.inserts;
 
+import static scripts.inserts.model.InsertModelTable.*;
+import static scripts.inserts.parameters.InsertConstraintsTables.*;
+import static scripts.inserts.parameters.InsertParametersTables.*;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -115,104 +119,7 @@ public class InsertDynamicTables {
     return sb.toString();
   }
 
-  private static String buildInsertConstraintEdgeQuery(
-      UUID uuid, ConstraintEdge constraint, Model model) {
-    return String.format(
-        "INSERT INTO constraint_edge(id, source_parameter_id,target_parameter_id) VALUES ('%s',"
-            + "(SELECT id FROM parameter WHERE name = '%s' AND model_id = (SELECT id FROM model WHERE name = '%s')),"
-            + "(SELECT id FROM parameter WHERE name = '%s' AND model_id = (SELECT id FROM model WHERE name = '%s')));",
-        uuid, constraint.getSource(), model.getName(), constraint.getTarget(), model.getName());
-  }
-
-  private static String buildInsertMappingQuery(
-      UUID uuid, UUID constraintUuid, String constraintParam, Domain domain, Model model) {
-    return String.format(
-        "INSERT INTO mapping(id,constraint_id,parameter_type_definition_id) VALUES ('%s','%s',"
-            + "(SELECT id FROM parameter_type_definition WHERE parameter_id = (SELECT id FROM parameter WHERE name = '%s' AND model_id = (SELECT id FROM model WHERE name = '%s')) and parameter_type_id = (SELECT id FROM parameter_type WHERE name = '%s')));",
-        uuid, constraintUuid, constraintParam, model.getName(), getParameterType(domain));
-  }
-
-  private static String generateConstraintValueQuery(
-      Item item, UUID mappingSourceUuid, UUID mappingTargetUuid) {
-    StringBuilder sb = new StringBuilder();
-    String sourceType = getParameterType(item.getSource());
-    String targetType = getParameterType(item.getTarget());
-    if ("categorical".equals(sourceType)) {
-      sb.append(buildCategoricalConstraintValueQuery(item.getSource(), mappingSourceUuid));
-    }
-    if ("categorical".equals(targetType)) {
-      sb.append(buildCategoricalConstraintValueQuery(item.getTarget(), mappingTargetUuid));
-    }
-    if ("integer".equals(sourceType)) {
-      sb.append(buildIntegerConstraintRangeQuery(item.getSource(), mappingSourceUuid));
-    }
-    if ("integer".equals(targetType)) {
-      sb.append(buildIntegerConstraintRangeQuery(item.getTarget(), mappingTargetUuid));
-    }
-    if ("float".equals(sourceType)) {
-      sb.append(buildFloatConstraintRangeQuery(item.getSource(), mappingSourceUuid));
-    }
-    if ("float".equals(targetType)) {
-      sb.append(buildFloatConstraintRangeQuery(item.getTarget(), mappingTargetUuid));
-    }
-    if ("boolean".equals(sourceType)) {
-      sb.append(buildBooleanConstraintValueQuery(item.getSource(), mappingSourceUuid));
-    }
-    if ("boolean".equals(targetType)) {
-      sb.append(buildBooleanConstraintValueQuery(item.getTarget(), mappingTargetUuid));
-    }
-    return sb.toString();
-  }
-
-  private static String buildCategoricalConstraintValueQuery(Domain domain, UUID uuid) {
-    StringBuilder sb = new StringBuilder();
-    for (Object value : domain.getCategoricalSet().getCategories()) {
-      sb.append(
-          String.format(
-              "INSERT INTO categorical_constraint_value(mapping_id,value) VALUES ('%s','%s');",
-              uuid, value));
-    }
-    return sb.toString();
-  }
-
-  private static String buildIntegerConstraintRangeQuery(Domain domain, UUID uuid) {
-    StringBuilder sb = new StringBuilder();
-    for (Range range : domain.getIntegerSet().getRanges()) {
-      sb.append(
-          String.format(
-              "INSERT INTO integer_constraint_range(mapping_id,lower,upper) VALUES ('%s',%d,%d);",
-              uuid, range.getStart(), range.getStop()));
-    }
-    return sb.toString();
-  }
-
-  private static String buildFloatConstraintRangeQuery(Domain domain, UUID uuid) {
-    StringBuilder sb = new StringBuilder();
-    for (Interval interval : domain.getFloatSet().getIntervals()) {
-      sb.append(
-          String.format(
-              "INSERT INTO float_constraint_range(mapping_id,is_left_open,is_right_open,lower,upper) VALUES ('%s',%s,%s,%f,%s);",
-              uuid,
-              interval.getLeft(),
-              interval.getRight(),
-              interval.getLower(),
-              interval.getUpper()));
-    }
-    return sb.toString();
-  }
-
-  private static String buildBooleanConstraintValueQuery(Domain domain, UUID uuid) {
-    StringBuilder sb = new StringBuilder();
-    for (Object value : domain.getCategoricalSet().getCategories()) {
-      sb.append(
-          String.format(
-              "INSERT INTO boolean_constraint_value(mapping_id,value) VALUES ('%s',%s);",
-              uuid, value));
-    }
-    return sb.toString();
-  }
-
-  private static List<ParameterTypeDistribution> getParameterTypeDistributionList(
+  public static List<ParameterTypeDistribution> getParameterTypeDistributionList(
       HyperParameter parameter) {
     List<ParameterTypeDistribution> parameterTypes = new ArrayList<>();
     Domain domain = parameter.getDomain();
@@ -240,191 +147,33 @@ public class InsertDynamicTables {
     return parameterTypes;
   }
 
-  private static String getParameterType(Domain domain) {
-    String parameterType = null;
-    if (domain.getCategoricalSet() != null
-        && !domain.getCategoricalSet().getCategories().isEmpty()) {
-      if (domain.getCategoricalSet().getCategories().contains("True")
-          || domain.getCategoricalSet().getCategories().contains("False")) {
-        parameterType = "boolean";
-      } else {
-        parameterType = "categorical";
-      }
-    }
-
-    if (domain.getFloatSet() != null && !domain.getFloatSet().getIntervals().isEmpty()) {
-      parameterType = "float";
-    }
-
-    if (domain.getIntegerSet() != null && !domain.getIntegerSet().getRanges().isEmpty()) {
-      parameterType = "integer";
-    }
-    return parameterType;
-  }
-
-  private static String buildInsertIntoParameterTypeDefinitionSQL(Model model) {
-    StringBuilder sb = new StringBuilder();
-
-    for (HyperParameter parameter : model.getHyperParameters()) {
-      List<ParameterTypeDistribution> parameterTypes = getParameterTypeDistributionList(parameter);
-      int count = 0;
-
-      for (ParameterTypeDistribution parameterType : parameterTypes) {
-        sb.append(
-                "INSERT INTO parameter_type_definition(parameter_id, parameter_type_id, parameter_distribution_type_id, ordering) VALUES ((select id from parameter where name='")
-            .append(parameter.getName())
-            .append("'  and model_id=(select id from model where name='")
-            .append(model.getName())
-            .append("')), (select id from parameter_type where name='")
-            .append(parameterType.getParameterType())
-            .append("'), ")
-            .append("(select id from parameter_distribution_type where name='")
-            .append(parameterType.getParameterDistribution())
-            .append("'), ")
-            .append(count)
-            .append(");\n");
-        count++;
-      }
-    }
-    return sb.toString();
-  }
-
   private static String buildInsertRestParameterTablesSQL(Model model) {
     StringBuilder sb = new StringBuilder();
     for (HyperParameter parameter : model.getHyperParameters()) {
-      List<ParameterTypeDistribution> parameterTypes = getParameterTypeDistributionList(parameter);
-
       Object defaultValue = parameter.getDefaultValue();
+      List<ParameterTypeDistribution> parameterTypes = getParameterTypeDistributionList(parameter);
       for (ParameterTypeDistribution parameterType : parameterTypes) {
+        String subQuery = buildParameterTypeDefinitionQuery(model, parameter, parameterType);
 
         if (parameterType.getParameterType().equals("categorical")) {
-          String strDefaultValue = null;
-          if (defaultValue instanceof String) {
-            strDefaultValue = (String) defaultValue;
-          }
-          sb.append(
-                  "INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-              .append(parameter.getName())
-              .append("'  and model_id=(select id from model where name='")
-              .append(model.getName())
-              .append("') and parameter_type_id=(select id from parameter_type where name='")
-              .append(parameterType.getParameterType())
-              .append("'))), ");
-          if (strDefaultValue != null) {
-            sb.append("'").append(strDefaultValue).append("'");
-          } else {
-            sb.append(strDefaultValue);
-          }
-          sb.append(");\n");
+          appendCategoricalParameterSQL(sb, defaultValue, subQuery);
           for (Object value : parameter.getDomain().getCategoricalSet().getCategories()) {
-            sb.append(
-                    "INSERT INTO categorical_parameter_value(parameter_type_definition_id, value ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-                .append(parameter.getName())
-                .append("'  and model_id=(select id from model where name='")
-                .append(model.getName())
-                .append("') and parameter_type_id=(select id from parameter_type where name='")
-                .append(parameterType.getParameterType())
-                .append("'))), '")
-                .append(value)
-                .append("');\n");
+            appendCategoricalParameterValueSQL(sb, value, subQuery);
           }
-        }
-        if (parameterType.getParameterType().equals("float")) {
-          Float floatDefaultValue = null;
-          if (defaultValue instanceof Float) {
-            floatDefaultValue = (Float) defaultValue;
-          } else if (defaultValue instanceof Double) {
-            floatDefaultValue = ((Double) defaultValue).floatValue();
-          }
-          sb.append(
-                  "INSERT INTO float_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-              .append(parameter.getName())
-              .append("'  and model_id=(select id from model where name='")
-              .append(model.getName())
-              .append("') and parameter_type_id=(select id from parameter_type where name='")
-              .append(parameterType.getParameterType())
-              .append("'))), ")
-              .append(floatDefaultValue)
-              .append(");\n");
+        } else if (parameterType.getParameterType().equals("float")) {
+          appendFloatParameterSQL(sb, defaultValue, subQuery);
           for (Interval interval : parameter.getDomain().getFloatSet().getIntervals()) {
-            sb.append(
-                    "INSERT INTO float_parameter_range(parameter_type_definition_id, is_left_open, is_right_open, lower, upper ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-                .append(parameter.getName())
-                .append("'  and model_id=(select id from model where name='")
-                .append(model.getName())
-                .append("') and parameter_type_id=(select id from parameter_type where name='")
-                .append(parameterType.getParameterType())
-                .append("'))), ")
-                .append(interval.getLeft())
-                .append(", ")
-                .append(interval.getRight())
-                .append(", ")
-                .append(interval.getLower())
-                .append(", ")
-                .append(interval.getUpper())
-                .append(");\n");
+            appendFloatParameterRangeSQL(sb, interval, subQuery);
           }
-        }
-        if (parameterType.getParameterType().equals("integer")) {
-          Integer intDefaultValue = null;
-          if (defaultValue instanceof Integer) {
-            intDefaultValue = (Integer) defaultValue;
-          }
-          sb.append(
-                  "INSERT INTO integer_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-              .append(parameter.getName())
-              .append("'  and model_id=(select id from model where name='")
-              .append(model.getName())
-              .append("') and parameter_type_id=(select id from parameter_type where name='")
-              .append(parameterType.getParameterType())
-              .append("'))), ")
-              .append(intDefaultValue)
-              .append(");\n");
+        } else if (parameterType.getParameterType().equals("integer")) {
+          appendIntegerParameterSQL(sb, defaultValue, subQuery);
           for (Range range : parameter.getDomain().getIntegerSet().getRanges()) {
-            sb.append(
-                    "INSERT INTO integer_parameter_range(parameter_type_definition_id, start, stop ) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-                .append(parameter.getName())
-                .append("'  and model_id=(select id from model where name='")
-                .append(model.getName())
-                .append("') and parameter_type_id=(select id from parameter_type where name='")
-                .append(parameterType.getParameterType())
-                .append("'))), ")
-                .append(range.getStart())
-                .append(", ")
-                .append(range.getStop())
-                .append(");\n");
+            appendIntegerParameterRangeSQL(sb, range, subQuery);
           }
-        }
-        if (parameterType.getParameterType().equals("boolean")) {
-          Boolean boolDefaultValue = null;
-          if (defaultValue instanceof Boolean) {
-            boolDefaultValue = (Boolean) defaultValue;
-          }
-          sb.append(
-                  "INSERT INTO boolean_parameter(parameter_type_definition_id, default_value) VALUES ((select id from parameter_type_definition where parameter_id=(select id from parameter where name='")
-              .append(parameter.getName())
-              .append("'  and model_id=(select id from model where name='")
-              .append(model.getName())
-              .append("') and parameter_type_id=(select id from parameter_type where name='")
-              .append(parameterType.getParameterType())
-              .append("'))), ")
-              .append(boolDefaultValue)
-              .append(");\n");
+        } else if (parameterType.getParameterType().equals("boolean")) {
+          appendBooleanParameterSQL(sb, defaultValue, subQuery);
         }
       }
-    }
-    return sb.toString();
-  }
-
-  private static String buildInsertIntoIncompatibleMetricSQL(Model model) {
-    StringBuilder sb = new StringBuilder();
-    for (String metric : model.getIncompatibleMetrics()) {
-      sb.append(
-              "INSERT INTO incompatible_metric(model_id, metric_id) VALUES ((select id from model where name='")
-          .append(model.getName())
-          .append("'), (select id from metric where name='")
-          .append(metric)
-          .append("'));\n");
     }
     return sb.toString();
   }
@@ -444,74 +193,6 @@ public class InsertDynamicTables {
 
     String modelDescription = metadata.getModelDescription().replace("'", "''");
     metadata.setModelDescription(modelDescription);
-  }
-
-  private static String buildInsertIntoModelSQL(
-      Model model, List<EnsembleFamily> ensembleFamilies) {
-    StringBuilder sb = new StringBuilder();
-
-    String advantagesArray = "{" + String.join(",", model.getMetadata().getAdvantages()) + "}";
-    String disadvantagesArray =
-        "{" + String.join(",", model.getMetadata().getDisadvantages()) + "}";
-
-    String ensembleType = null;
-    String familyType = null;
-    for (EnsembleFamily ensembleFamily : ensembleFamilies) {
-      if (ensembleFamily.getName().equals(model.getName())) {
-        ensembleType = ensembleFamily.getEnsembleType();
-        familyType = ensembleFamily.getFamily();
-        break;
-      }
-    }
-
-    sb.append(
-            "INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, ensemble_type_id, family_type_id, decision_tree, model_type_id) VALUES ('")
-        .append(model.getName())
-        .append("', ")
-        .append("(select id from ml_task where name='")
-        .append(model.getMlTask())
-        .append("'),'")
-        .append(model.getMetadata().getModelDescription())
-        .append("', '")
-        .append(model.getMetadata().getDisplayName())
-        .append("', ")
-        .append("(select id from model_structure_type where name='")
-        .append(model.getMetadata().getStructure())
-        .append("'), '")
-        .append(advantagesArray)
-        .append("', '")
-        .append(disadvantagesArray)
-        .append("',")
-        .append(model.isBlackListed())
-        .append(",")
-        .append("(select id from ensemble_type where name='")
-        .append(ensembleType)
-        .append("'),(select id from family_type where name='")
-        .append(familyType)
-        .append("'),")
-        .append(model.getMetadata().getSupports().getDecisionTree())
-        .append(",")
-        .append("(select id from model_type where name='")
-        .append(model.getMetadata().getModelType().get(0))
-        .append("'));\n");
-
-    return sb.toString();
-  }
-
-  private static String buildInsertIntoModelToGroupSQL(String name, List<String> modelGroups) {
-    StringBuilder sb = new StringBuilder();
-
-    for (String group : modelGroups) {
-      sb.append(
-              "INSERT INTO model_group(model_id, group_id) VALUES ((select id from Model where name='")
-          .append(name)
-          .append("'),")
-          .append("(select id from group_type where name='")
-          .append(group)
-          .append("'));\n");
-    }
-
-    return sb.toString();
   }
 
   private static String buildInsertIntoParameterAndParameterValueSQL(Model model) {
@@ -550,28 +231,5 @@ public class InsertDynamicTables {
       sb.append(insertParameterSQL(parameter, description, count, name));
     }
     return sb.toString();
-  }
-
-  private static String insertParameterSQL(
-      HyperParameter parameter, String description, int count, String name) {
-    return new StringBuilder(
-            "INSERT INTO parameter(name, label, description, enabled, fixed_value, ordering, model_id) VALUES ('")
-        .append(parameter.getName())
-        .append("', '")
-        .append(parameter.getLabel())
-        .append("',")
-        .append("'")
-        .append(description)
-        .append("',")
-        .append(parameter.getEnabled())
-        .append(",")
-        .append(parameter.isFixedValue())
-        .append(",")
-        .append(count)
-        .append(",")
-        .append("(select id from Model where name='")
-        .append(name)
-        .append("'));\n")
-        .toString();
   }
 }
