@@ -1,24 +1,23 @@
 package model;
 
-import model.Domain;
 
 public class Item {
-    private Domain source;
-    private Domain target;
+  private Domain source;
+  private Domain target;
 
-    public Domain getSource() {
-        return source;
-    }
+  public Domain getSource() {
+    return source;
+  }
 
-    public void setSource(Domain source) {
-        this.source = source;
-    }
+  public void setSource(Domain source) {
+    this.source = source;
+  }
 
-    public Domain getTarget() {
-        return target;
-    }
+  public Domain getTarget() {
+    return target;
+  }
 
-    public void setTarget(Domain target) {
-        this.target = target;
-    }
+  public void setTarget(Domain target) {
+    this.target = target;
+  }
 }

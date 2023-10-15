@@ -5,60 +5,58 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "left",
-        "lower",
-        "upper",
-        "right"
-})
+@JsonPropertyOrder({"left", "lower", "upper", "right"})
 public class Interval {
 
-    @JsonProperty("left")
-    private Boolean left;
-    @JsonProperty("lower")
-    private Double lower;
-    @JsonProperty("upper")
-    private Double upper;
-    @JsonProperty("right")
-    private Boolean right;
+  @JsonProperty("left")
+  private Boolean left;
 
-    @JsonProperty("left")
-    public Boolean getLeft() {
-        return left;
-    }
+  @JsonProperty("lower")
+  private Double lower;
 
-    @JsonProperty("left")
-    public void setLeft(Boolean left) {
-        this.left = left;
-    }
+  @JsonProperty("upper")
+  private Double upper;
 
-    @JsonProperty("lower")
-    public Double getLower() {
-        return lower;
-    }
+  @JsonProperty("right")
+  private Boolean right;
 
-    @JsonProperty("lower")
-    public void setLower(Double lower) {
-        this.lower = lower;
-    }
+  @JsonProperty("left")
+  public Boolean getLeft() {
+    return left;
+  }
 
-    @JsonProperty("upper")
-    public Double getUpper() {
-        return upper;
-    }
+  @JsonProperty("left")
+  public void setLeft(Boolean left) {
+    this.left = left;
+  }
 
-    @JsonProperty("upper")
-    public void setUpper(Double upper) {
-        this.upper = upper;
-    }
+  @JsonProperty("lower")
+  public Double getLower() {
+    return lower;
+  }
 
-    @JsonProperty("right")
-    public Boolean getRight() {
-        return right;
-    }
+  @JsonProperty("lower")
+  public void setLower(Double lower) {
+    this.lower = lower;
+  }
 
-    @JsonProperty("right")
-    public void setRight(Boolean right) {
-        this.right = right;
-    }
+  @JsonProperty("upper")
+  public Double getUpper() {
+    return upper;
+  }
+
+  @JsonProperty("upper")
+  public void setUpper(Double upper) {
+    this.upper = upper;
+  }
+
+  @JsonProperty("right")
+  public Boolean getRight() {
+    return right;
+  }
+
+  @JsonProperty("right")
+  public void setRight(Boolean right) {
+    this.right = right;
+  }
 }

@@ -6,45 +6,47 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "floatSet",
-        "integerSet",
-        "categoricalSet",
+  "floatSet",
+  "integerSet",
+  "categoricalSet",
 })
 public class Domain {
-    @JsonProperty("floatSet")
-    private FloatSet floatSet;
-    @JsonProperty("integerSet")
-    private IntegerSet integerSet;
-    @JsonProperty("categoricalSet")
-    private CategoricalSet categoricalSet;
+  @JsonProperty("floatSet")
+  private FloatSet floatSet;
 
-    @JsonProperty("floatSet")
-    public FloatSet getFloatSet() {
-        return floatSet;
-    }
+  @JsonProperty("integerSet")
+  private IntegerSet integerSet;
 
-    @JsonProperty("floatSet")
-    public void setFloatSet(FloatSet floatSet) {
-        this.floatSet = floatSet;
-    }
+  @JsonProperty("categoricalSet")
+  private CategoricalSet categoricalSet;
 
-    @JsonProperty("integerSet")
-    public IntegerSet getIntegerSet() {
-        return integerSet;
-    }
+  @JsonProperty("floatSet")
+  public FloatSet getFloatSet() {
+    return floatSet;
+  }
 
-    @JsonProperty("integerSet")
-    public void setIntegerSet(IntegerSet integerSet) {
-        this.integerSet = integerSet;
-    }
+  @JsonProperty("floatSet")
+  public void setFloatSet(FloatSet floatSet) {
+    this.floatSet = floatSet;
+  }
 
-    @JsonProperty("categoricalSet")
-    public CategoricalSet getCategoricalSet() {
-        return categoricalSet;
-    }
+  @JsonProperty("integerSet")
+  public IntegerSet getIntegerSet() {
+    return integerSet;
+  }
 
-    @JsonProperty("categoricalSet")
-    public void setCategoricalSet(CategoricalSet categoricalSet) {
-        this.categoricalSet = categoricalSet;
-    }
+  @JsonProperty("integerSet")
+  public void setIntegerSet(IntegerSet integerSet) {
+    this.integerSet = integerSet;
+  }
+
+  @JsonProperty("categoricalSet")
+  public CategoricalSet getCategoricalSet() {
+    return categoricalSet;
+  }
+
+  @JsonProperty("categoricalSet")
+  public void setCategoricalSet(CategoricalSet categoricalSet) {
+    this.categoricalSet = categoricalSet;
+  }
 }

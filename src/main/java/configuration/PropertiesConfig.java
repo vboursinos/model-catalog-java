@@ -7,16 +7,15 @@ import java.util.Properties;
 
 public class PropertiesConfig {
 
-    private static final String PROPERTIES_FILE_PATH = "src/main/resources/configuration.properties";
+  private static final String PROPERTIES_FILE_PATH = "src/main/resources/configuration.properties";
 
-    public static Properties getProperties() {
-        Properties properties = new Properties();
-        try {
-            properties.load(Files.newInputStream(Paths.get(PROPERTIES_FILE_PATH)));
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        return properties;
+  public static Properties getProperties() {
+    Properties properties = new Properties();
+    try {
+      properties.load(Files.newInputStream(Paths.get(PROPERTIES_FILE_PATH)));
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
     }
+    return properties;
+  }
 }
-

@@ -6,157 +6,166 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "name",
-        "label",
-        "description",
-        "domain",
-        "enabled",
-        "defaultValue",
-        "fixedValue",
-        "constraint",
-        "constraintInformation",
-        "distribution",
+  "name",
+  "label",
+  "description",
+  "domain",
+  "enabled",
+  "defaultValue",
+  "fixedValue",
+  "constraint",
+  "constraintInformation",
+  "distribution",
 })
 public class HyperParameter {
 
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("label")
-    private String label;
-    @JsonProperty("description")
-    private String description;
-    @JsonProperty("domain")
-    private Domain domain;
-    @JsonProperty("enabled")
-    private Boolean enabled;
+  @JsonProperty("name")
+  private String name;
 
-    //can be String, Boolean, Integer, Float, or null
-    @JsonProperty("defaultValue")
-    private Object defaultValue;
-    @JsonProperty("constraint")
-    private Boolean constraint;
-    @JsonProperty("constraintInformation")
-    private String constraintInformation;
-    @JsonProperty("distribution")
-    private Distribution distribution;
-    @JsonProperty("fixedValue")
-    private boolean fixedValue;
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
+  @JsonProperty("label")
+  private String label;
 
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
-    }
+  @JsonProperty("description")
+  private String description;
 
-    @JsonProperty("label")
-    public String getLabel() {
-        return label;
-    }
+  @JsonProperty("domain")
+  private Domain domain;
 
-    @JsonProperty("label")
-    public void setLabel(String label) {
-        this.label = label;
-    }
+  @JsonProperty("enabled")
+  private Boolean enabled;
 
-    @JsonProperty("description")
-    public String getDescription() {
-        return description;
-    }
+  // can be String, Boolean, Integer, Float, or null
+  @JsonProperty("defaultValue")
+  private Object defaultValue;
 
-    @JsonProperty("description")
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  @JsonProperty("constraint")
+  private Boolean constraint;
 
-    @JsonProperty("domain")
-    public Domain getDomain() {
-        return domain;
-    }
+  @JsonProperty("constraintInformation")
+  private String constraintInformation;
 
-    @JsonProperty("domain")
-    public void setDomain(Domain domain) {
-        this.domain = domain;
-    }
+  @JsonProperty("distribution")
+  private Distribution distribution;
 
-    @JsonProperty("enabled")
-    public Boolean getEnabled() {
-        return enabled;
-    }
+  @JsonProperty("fixedValue")
+  private boolean fixedValue;
 
-    @JsonProperty("enabled")
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
 
-    @JsonProperty("defaultValue")
-    public Object getDefaultValue() {
-        return defaultValue;
-    }
+  @JsonProperty("name")
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    @JsonProperty("defaultValue")
-    public void setDefaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
-    }
+  @JsonProperty("label")
+  public String getLabel() {
+    return label;
+  }
 
-    @JsonProperty("constraint")
-    public Boolean getConstraint() {
-        return constraint;
-    }
+  @JsonProperty("label")
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-    @JsonProperty("constraint")
-    public void setConstraint(Boolean constraint) {
-        this.constraint = constraint;
-    }
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
 
-    @JsonProperty("constraintInformation")
-    public String getConstraintInformation() {
-        return constraintInformation;
-    }
+  @JsonProperty("description")
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    @JsonProperty("constraintInformation")
-    public void setConstraintInformation(String constraintInformation) {
-        this.constraintInformation = constraintInformation;
-    }
+  @JsonProperty("domain")
+  public Domain getDomain() {
+    return domain;
+  }
 
-    @JsonProperty("distribution")
-    public Distribution getDistribution() {
-        return distribution;
-    }
+  @JsonProperty("domain")
+  public void setDomain(Domain domain) {
+    this.domain = domain;
+  }
 
-    @JsonProperty("distribution")
-    public void setDistribution(Distribution distribution) {
-        this.distribution = distribution;
-    }
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
+  }
 
-    @JsonProperty("fixedValue")
-    public boolean isFixedValue() {
-        return fixedValue;
-    }
+  @JsonProperty("enabled")
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
 
-    @JsonProperty("fixedValue")
-    public void setFixedValue(boolean fixedValue) {
-        this.fixedValue = fixedValue;
-    }
+  @JsonProperty("defaultValue")
+  public Object getDefaultValue() {
+    return defaultValue;
+  }
 
-    /*    Object defaultValue = parameter.getDefaultValue();
+  @JsonProperty("defaultValue")
+  public void setDefaultValue(Object defaultValue) {
+    this.defaultValue = defaultValue;
+  }
 
-    if(defaultValue instanceof String) {
-        String strDefaultValue = (String) defaultValue;
-        // use strDefaultValue
-    }
-    else if(defaultValue instanceof Boolean) {
-        Boolean boolDefaultValue = (Boolean) defaultValue;
-        // use boolDefaultValue
-    }
-    else if(defaultValue instanceof Integer) {
-        Integer intDefaultValue = (Integer) defaultValue;
-        // use intDefaultValue
-    }
-    else if(defaultValue instanceof Float) {
-        Float floatDefaultValue = (Float) defaultValue;
-        // use floatDefaultValue
-    }*/
+  @JsonProperty("constraint")
+  public Boolean getConstraint() {
+    return constraint;
+  }
+
+  @JsonProperty("constraint")
+  public void setConstraint(Boolean constraint) {
+    this.constraint = constraint;
+  }
+
+  @JsonProperty("constraintInformation")
+  public String getConstraintInformation() {
+    return constraintInformation;
+  }
+
+  @JsonProperty("constraintInformation")
+  public void setConstraintInformation(String constraintInformation) {
+    this.constraintInformation = constraintInformation;
+  }
+
+  @JsonProperty("distribution")
+  public Distribution getDistribution() {
+    return distribution;
+  }
+
+  @JsonProperty("distribution")
+  public void setDistribution(Distribution distribution) {
+    this.distribution = distribution;
+  }
+
+  @JsonProperty("fixedValue")
+  public boolean isFixedValue() {
+    return fixedValue;
+  }
+
+  @JsonProperty("fixedValue")
+  public void setFixedValue(boolean fixedValue) {
+    this.fixedValue = fixedValue;
+  }
+
+  /*    Object defaultValue = parameter.getDefaultValue();
+
+  if(defaultValue instanceof String) {
+      String strDefaultValue = (String) defaultValue;
+      // use strDefaultValue
+  }
+  else if(defaultValue instanceof Boolean) {
+      Boolean boolDefaultValue = (Boolean) defaultValue;
+      // use boolDefaultValue
+  }
+  else if(defaultValue instanceof Integer) {
+      Integer intDefaultValue = (Integer) defaultValue;
+      // use intDefaultValue
+  }
+  else if(defaultValue instanceof Float) {
+      Float floatDefaultValue = (Float) defaultValue;
+      // use floatDefaultValue
+  }*/
 }

@@ -5,35 +5,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "start",
-        "stop"
-})
+@JsonPropertyOrder({"start", "stop"})
 public class Range {
 
-    @JsonProperty("start")
-    private Integer start;
-    @JsonProperty("stop")
-    private Integer stop;
+  @JsonProperty("start")
+  private Integer start;
 
-    @JsonProperty("start")
-    public Integer getStart() {
-        return start;
-    }
+  @JsonProperty("stop")
+  private Integer stop;
 
-    @JsonProperty("start")
-    public void setStart(Integer start) {
-        this.start = start;
-    }
+  @JsonProperty("start")
+  public Integer getStart() {
+    return start;
+  }
 
-    @JsonProperty("stop")
-    public Integer getStop() {
-        return stop;
-    }
+  @JsonProperty("start")
+  public void setStart(Integer start) {
+    this.start = start;
+  }
 
-    @JsonProperty("stop")
-    public void setStop(Integer stop) {
-        this.stop = stop;
-    }
+  @JsonProperty("stop")
+  public Integer getStop() {
+    return stop;
+  }
 
+  @JsonProperty("stop")
+  public void setStop(Integer stop) {
+    this.stop = stop;
+  }
 }

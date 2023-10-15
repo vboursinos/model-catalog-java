@@ -3,16 +3,15 @@ package model;
 import java.util.List;
 
 public class Models {
-    private List<Model> models;
+  private List<Model> models;
 
-    public Models() {
-    }
+  public Models() {}
 
-    public List<Model> getModels() {
-        return models;
-    }
+  public List<Model> getModels() {
+    return models;
+  }
 
-    public void setModels(List<Model> models) {
-        this.models = models;
-    }
+  public void setModels(List<Model> models) {
+    this.models = models;
+  }
 }
