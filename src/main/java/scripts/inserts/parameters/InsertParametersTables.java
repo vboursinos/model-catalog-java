@@ -126,7 +126,7 @@ public class InsertParametersTables {
       StringBuilder sb, Range range, String subQuery) {
     String insertSQL =
         String.format(
-            "INSERT INTO integer_parameter_range(parameter_type_definition_id, start, stop) VALUES (%s, %d, %d);\n",
+            "INSERT INTO integer_parameter_value(parameter_type_definition_id, lower, upper) VALUES (%s, %d, %d);\n",
             subQuery, range.getStart(), range.getStop());
     sb.append(insertSQL);
   }

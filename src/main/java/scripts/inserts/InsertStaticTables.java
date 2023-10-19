@@ -148,7 +148,7 @@ public class InsertStaticTables {
   static String buildInsertMlTaskSQL(Set<String> mlTaskSet) {
     StringBuilder sb = new StringBuilder();
     for (String mlTask : mlTaskSet) {
-      sb.append("INSERT INTO ml_task(name) VALUES ('").append(mlTask).append("');\n");
+      sb.append("INSERT INTO ml_task_type(name) VALUES ('").append(mlTask).append("');\n");
     }
     return sb.toString();
   }
@@ -175,10 +175,10 @@ public class InsertStaticTables {
         familyTypes.add(model.getFamily());
       }
       for (String ensembleType : ensembleTypes) {
-        sb.append("INSERT INTO ensemble_type(name) VALUES ('").append(ensembleType).append("');\n");
+        sb.append("INSERT INTO model_ensemble_type(name) VALUES ('").append(ensembleType).append("');\n");
       }
       for (String familyType : familyTypes) {
-        sb.append("INSERT INTO family_type(name) VALUES ('").append(familyType).append("');\n");
+        sb.append("INSERT INTO model_family_type(name) VALUES ('").append(familyType).append("');\n");
       }
     } catch (IOException e) {
       logger.error("Error reading ensemble-family.json file: " + e.getMessage(), e);
@@ -193,7 +193,7 @@ public class InsertStaticTables {
     List<String> groups = Arrays.asList(groupsProperty.split(","));
 
     for (String group : groups) {
-      sb.append("INSERT INTO group_type(name) VALUES ('").append(group).append("');\n");
+      sb.append("INSERT INTO model_group_type(name) VALUES ('").append(group).append("');\n");
     }
     return sb.toString();
   }

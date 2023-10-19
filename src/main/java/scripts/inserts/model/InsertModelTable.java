@@ -22,7 +22,7 @@ public class InsertModelTable {
     }
 
     return String.format(
-        "INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, ensemble_type_id, family_type_id, decision_tree, model_type_id) VALUES ('%s', (select id from ml_task where name='%s'),'%s', '%s', (select id from model_structure_type where name='%s'), '%s', '%s', %b, (select id from ensemble_type where name='%s'),(select id from family_type where name='%s'), %b, (select id from model_type where name='%s'));\n",
+        "INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, ensemble_type_id, family_type_id, decision_tree, model_type_id) VALUES ('%s', (select id from ml_task_type where name='%s'),'%s', '%s', (select id from model_structure_type where name='%s'), '%s', '%s', %b, (select id from model_ensemble_type where name='%s'),(select id from model_family_type where name='%s'), %b, (select id from model_type where name='%s'));\n",
         model.getName(),
         model.getMlTask(),
         model.getMetadata().getModelDescription(),
@@ -42,10 +42,10 @@ public class InsertModelTable {
 
     for (String group : modelGroups) {
       sb.append(
-              "INSERT INTO model_group(model_id, group_id) VALUES ((select id from Model where name='")
+              "INSERT INTO rel_model__groups(model_id, group_id) VALUES ((select id from Model where name='")
           .append(name)
           .append("'),")
-          .append("(select id from group_type where name='")
+          .append("(select id from model_group_type where name='")
           .append(group)
           .append("'));\n");
     }
@@ -57,7 +57,7 @@ public class InsertModelTable {
     StringBuilder sb = new StringBuilder();
     for (String metric : model.getIncompatibleMetrics()) {
       sb.append(
-              "INSERT INTO incompatible_metric(model_id, metric_id) VALUES ((select id from model where name='")
+              "INSERT INTO rel_model__incompatible_metrics(model_id, metric_id) VALUES ((select id from model where name='")
           .append(model.getName())
           .append("'), (select id from metric where name='")
           .append(metric)
