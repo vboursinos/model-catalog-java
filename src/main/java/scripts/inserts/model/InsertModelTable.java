@@ -30,7 +30,7 @@ public class InsertModelTable {
         model.getMetadata().getStructure(),
         advantagesArray,
         disadvantagesArray,
-        model.isBlackListed(),
+        !model.isBlackListed(),
         ensembleType,
         familyType,
         model.getMetadata().getSupports().getDecisionTree(),

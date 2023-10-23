@@ -175,10 +175,14 @@ public class InsertStaticTables {
         familyTypes.add(model.getFamily());
       }
       for (String ensembleType : ensembleTypes) {
-        sb.append("INSERT INTO model_ensemble_type(name) VALUES ('").append(ensembleType).append("');\n");
+        sb.append("INSERT INTO model_ensemble_type(name) VALUES ('")
+            .append(ensembleType)
+            .append("');\n");
       }
       for (String familyType : familyTypes) {
-        sb.append("INSERT INTO model_family_type(name) VALUES ('").append(familyType).append("');\n");
+        sb.append("INSERT INTO model_family_type(name) VALUES ('")
+            .append(familyType)
+            .append("');\n");
       }
     } catch (IOException e) {
       logger.error("Error reading ensemble-family.json file: " + e.getMessage(), e);
