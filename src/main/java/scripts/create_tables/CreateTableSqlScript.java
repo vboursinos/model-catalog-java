@@ -7,7 +7,7 @@ import utils.FileUtils;
 
 public class CreateTableSqlScript {
   private static final String SQL_DIR_PATH = "sql_scripts";
-  private static final String SETUP_SCRIPT_NAME = "setup.sql";
+  private static final String SETUP_SCRIPT_NAME = "1-DDL-create_initial_set_of_tables.sql";
 
   private static final Logger logger = LogManager.getLogger(CreateTableSqlScript.class);
 

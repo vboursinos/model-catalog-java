@@ -36,23 +36,23 @@ public class InsertStaticTables {
     Set<String> allMetrics = extractUniqueValues(mapper, dirPath, InsertStaticTables::getMetrics);
 
     // Write values to SQL files
-    createSQLFile("insert_model_type.sql", buildInsertModelTypeSQL(allModelTypes));
+    createSQLFile("9-DML-insert_model_type.sql", buildInsertModelTypeSQL(allModelTypes));
     logger.info("Model type sql file is created successfully");
-    createSQLFile("insert_group_type.sql", buildInsertGroupTypeSQL());
+    createSQLFile("5-DML-insert_group_type.sql", buildInsertGroupTypeSQL());
     logger.info("Group type sql file is created successfully");
-    createSQLFile("insert_parameter_type.sql", buildParameterTypeSQL());
+    createSQLFile("10-DML-insert_parameter_type.sql", buildParameterTypeSQL());
     logger.info("Parameter type sql file is created successfully");
-    createSQLFile("insert_distribution.sql", buildDistributionSQL());
+    createSQLFile("3-DML-insert_distribution.sql", buildDistributionSQL());
     logger.info("Distribution type sql file is created successfully");
     createSQLFile(
-        "insert_model_structure_type.sql",
+        "8-DML-insert_model_structure_type.sql",
         buildInsertModelStructureTypeSQL(allModelStructureTypes));
     logger.info("Model structure type sql file is created successfully");
-    createSQLFile("insert_ml_task.sql", buildInsertMlTaskSQL(allMlTasks));
+    createSQLFile("7-DML-insert_ml_task.sql", buildInsertMlTaskSQL(allMlTasks));
     logger.info("Ml_task sql file is created successfully");
-    createSQLFile("insert_metrics.sql", buildMetricSQL(allMetrics));
+    createSQLFile("6-DML-insert_metrics.sql", buildMetricSQL(allMetrics));
     logger.info("Metrics sql file is created successfully");
-    createSQLFile("insert_ensemble_family.sql", buildInsertEnsembleFamilyTypeSQL());
+    createSQLFile("4-DML-insert_ensemble_family.sql", buildInsertEnsembleFamilyTypeSQL());
     logger.info("Ensemble type and family type sql files are created successfully");
   }
 

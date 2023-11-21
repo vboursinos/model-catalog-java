@@ -54,8 +54,16 @@ public class InsertDynamicTables {
   private void createModelSqlFile(Models models) {
     String mltask = models.getModels().get(0).getMlTask();
     String sqlScript = buildInsertSQL(models);
+    String num;
+    if (mltask.equals("classification")) {
+      num = "11";
+    } else if (mltask.equals("forecasting")) {
+      num = "12";
+    } else {
+      num = "13";
+    }
     FileUtils.writeToFile(
-        Paths.get(SQL_DIR_PATH, String.format("insert_models_%s.sql", mltask)).toString(),
+        Paths.get(SQL_DIR_PATH, String.format("%s-DML-insert_models_%s.sql",num, mltask)).toString(),
         sqlScript);
     logger.info(mltask + " sql file created successfully!");
   }
@@ -96,7 +104,7 @@ public class InsertDynamicTables {
     sb.append(buildInsertIntoIncompatibleMetricSQL(model));
     sb.append(buildInsertIntoParameterTypeDefinitionSQL(model));
     sb.append(buildInsertRestParameterTablesSQL(model));
-    sb.append(buildInsertConstraintSQL(model));
+    //    sb.append(buildInsertConstraintSQL(model));
   }
 
   private static String buildInsertConstraintSQL(Model model) {
