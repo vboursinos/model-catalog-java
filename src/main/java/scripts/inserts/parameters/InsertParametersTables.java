@@ -76,7 +76,7 @@ public class InsertParametersTables {
       StringBuilder sb, Object value, String subQuery) {
     String insertSQL =
         String.format(
-            "INSERT INTO categorical_parameter_value(parameter_type_definition_id, value) VALUES (%s, '%s');\n",
+            "INSERT INTO categorical_parameter_value(categorical_parameter_id, value) VALUES ((select id from categorical_parameter where parameter_type_definition_id = %s), '%s');\n",
             subQuery, value);
     sb.append(insertSQL);
   }
@@ -100,7 +100,7 @@ public class InsertParametersTables {
       StringBuilder sb, Interval interval, String subQuery) {
     String insertSQL =
         String.format(
-            "INSERT INTO float_parameter_range(parameter_type_definition_id, is_left_open, is_right_open, lower, upper) VALUES (%s, %s, %s, %f, %f);\n",
+            "INSERT INTO float_parameter_range(float_parameter_id, is_left_open, is_right_open, lower, upper) VALUES ((select id from float_parameter where parameter_type_definition_id = %s), %s, %s, %f, %f);\n",
             subQuery,
             interval.getLeft(),
             interval.getRight(),
@@ -126,7 +126,7 @@ public class InsertParametersTables {
       StringBuilder sb, Range range, String subQuery) {
     String insertSQL =
         String.format(
-            "INSERT INTO integer_parameter_value(parameter_type_definition_id, lower, upper) VALUES (%s, %d, %d);\n",
+            "INSERT INTO integer_parameter_value(integer_parameter_id, lower, upper) VALUES ((select id from integer_parameter where parameter_type_definition_id = %s), %d, %d);\n",
             subQuery, range.getStart(), range.getStop());
     sb.append(insertSQL);
   }
