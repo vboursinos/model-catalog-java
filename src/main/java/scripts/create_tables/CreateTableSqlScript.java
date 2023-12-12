@@ -9,18 +9,27 @@ public class CreateTableSqlScript {
   private static final String SQL_DIR_PATH = "sql_scripts";
   private static final String SETUP_SCRIPT_NAME = "1-DDL-create_initial_set_of_tables.sql";
 
+  private static final String REVISION_SCRIPT_NAME = "14-DML-insert_rev.sql";
+
   private static final Logger logger = LogManager.getLogger(CreateTableSqlScript.class);
 
   public void createTablesScript() {
     String sqlScript = getSqlScript();
     FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, SETUP_SCRIPT_NAME).toString(), sqlScript);
-    logger.info("Create all db tables sql file is created successfully");
+    logger.info("Create all db tables. sql file is created successfully");
+
+    FileUtils.writeToFile(Paths.get(SQL_DIR_PATH, REVISION_SCRIPT_NAME).toString(), createRevision());
+    logger.info("Create revision sql script. file is created successfully");
   }
 
   private String getSqlScript() {
     return "-- changeset liquibaseuser:1\n" +
             "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\n" +
             "-- rollback -- You may not be able to drop the extension, so no rollback specified.\n" +
+            "\n" +
+            "CREATE SEQUENCE IF NOT EXISTS hibernate_sequence;\n" +
+            "\n" +
+            "CREATE SEQUENCE IF NOT EXISTS revinfo_seq INCREMENT BY 1;\n" +
             "\n" +
             "-- changeset liquibaseuser:2\n" +
             "CREATE OR REPLACE FUNCTION generate_uuid()\n" +
@@ -247,6 +256,220 @@ public class CreateTableSqlScript {
             "  mapping_id uuid REFERENCES mapping (id) NOT NULL,\n" +
             "  value varchar NOT NULL\n" +
             ");\n" +
-            "-- rollback DROP TABLE categorical_constraint\n";
+            "-- rollback DROP TABLE categorical_constraint\n" +
+            "-- changeset liquibaseuser:29\n" +
+            "CREATE TABLE model_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE model_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:30\n" +
+            "CREATE TABLE ml_task_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE ml_task_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:31\n" +
+            "CREATE TABLE model_structure_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE model_structure_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:32\n" +
+            "CREATE TABLE model_group_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE model_group_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:33\n" +
+            "CREATE TABLE model_ensemble_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE model_ensemble_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:34\n" +
+            "CREATE TABLE model_family_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE model_family_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:35\n" +
+            "CREATE TABLE model_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE model_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:36\n" +
+            "CREATE TABLE rel_model__groups_AUD (\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE rel_model__groups_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:37\n" +
+            "CREATE TABLE metric_AUD (\n" +
+            "  id uuid PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            "--  name varchar\n" +
+            ");\n" +
+            "-- rollback DROP TABLE metric_AUD;-- changeset liquibaseuser:38\n" +
+            "CREATE TABLE rel_model__incompatible_metrics_AUD (\n" +
+            "  model_id int,\n" +
+            "  metric_id int,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE rel_model__incompatible_metrics_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:39\n" +
+            "CREATE TABLE parameter_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  model_id int,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE parameter_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:40\n" +
+            "CREATE TABLE parameter_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE parameter_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:41\n" +
+            "CREATE TABLE parameter_distribution_type_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE parameter_distribution_type_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:42\n" +
+            "CREATE TABLE parameter_type_definition_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  parameter_id int,\n" +
+            "  parameter_type_id int,\n" +
+            "  parameter_distribution_type_id int,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE parameter_type_definition_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:43\n" +
+            "CREATE TABLE categorical_parameter_AUD (\n" +
+            "  parameter_type_definition_id int PRIMARY KEY,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE categorical_parameter_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:44\n" +
+            "CREATE TABLE categorical_parameter_value_AUD (\n" +
+            "  id int PRIMARY KEY,\n" +
+            "  parameter_type_definition_id int,\n" +
+            "  rev int NOT NULL,\n" +
+            "  revtype smallint,\n" +
+            "  created_by varchar,\n" +
+            "  created_at timestamp,\n" +
+            "  updated_by varchar,\n" +
+            "  updated_at timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE categorical_parameter_value_AUD;\n" +
+            "\n" +
+            "-- changeset liquibaseuser:xx\n" +
+            "CREATE TABLE revinfo (\n" +
+            "  rev SERIAL PRIMARY KEY,\n" +
+            "  revtstmp timestamp\n" +
+            ");\n" +
+            "-- rollback DROP TABLE revinfo;";
+  }
+
+  public String createRevision() {
+    return "create or replace function create_rev() returns integer\n" +
+          "    language sql\n" +
+          "as\n" +
+          "$$\n" +
+          "    insert into revinfo (rev, revtstmp)\n" +
+          "    values (nextval('hibernate_sequence'), CURRENT_TIMESTAMP)\n" +
+          "    returning rev\n" +
+          "$$;";
   }
 }
