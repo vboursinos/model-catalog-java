@@ -151,7 +151,7 @@ public class CreateTableSqlScript {
             "\n" +
             "-- changeset liquibaseuser:17\n" +
             "CREATE TABLE categorical_parameter (\n" +
-            "  parameter_type_definition_id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
+            "  id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
             "  default_value varchar\n" +
             ");\n" +
             "-- rollback DROP TABLE categorical_parameter;\n" +
@@ -159,14 +159,14 @@ public class CreateTableSqlScript {
             "-- changeset liquibaseuser:18\n" +
             "CREATE TABLE categorical_parameter_value (\n" +
             "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
-            "  parameter_type_definition_id uuid REFERENCES categorical_parameter (parameter_type_definition_id) NOT NULL,\n" +
+            "  parameter_type_definition_id uuid REFERENCES categorical_parameter (id) NOT NULL,\n" +
             "  value varchar NOT NULL\n" +
             ");\n" +
             "-- rollback DROP TABLE categorical_parameter_value;\n" +
             "\n" +
             "-- changeset liquibaseuser:19\n" +
             "CREATE TABLE integer_parameter (\n" +
-            "  parameter_type_definition_id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
+            "  id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
             "  default_value integer\n" +
             ");\n" +
             "-- rollback DROP TABLE integer_parameter;\n" +
@@ -174,7 +174,7 @@ public class CreateTableSqlScript {
             "-- changeset liquibaseuser:20\n" +
             "CREATE TABLE integer_parameter_value (\n" +
             "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
-            "  parameter_type_definition_id uuid REFERENCES integer_parameter (parameter_type_definition_id) NOT NULL,\n" +
+            "  parameter_type_definition_id uuid REFERENCES integer_parameter (id) NOT NULL,\n" +
             "  lower integer NOT NULL,\n" +
             "  upper integer NOT NULL\n" +
             ");\n" +
@@ -182,7 +182,7 @@ public class CreateTableSqlScript {
             "\n" +
             "-- changeset liquibaseuser:21\n" +
             "CREATE TABLE float_parameter (\n" +
-            "  parameter_type_definition_id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
+            "  id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
             "  default_value double precision\n" +
             ");\n" +
             "-- rollback DROP TABLE float_parameter;\n" +
@@ -190,7 +190,7 @@ public class CreateTableSqlScript {
             "-- changeset liquibaseuser:22\n" +
             "CREATE TABLE float_parameter_range (\n" +
             "  id uuid DEFAULT generate_uuid() PRIMARY KEY,\n" +
-            "  parameter_type_definition_id uuid REFERENCES float_parameter (parameter_type_definition_id) NOT NULL,\n" +
+            "  parameter_type_definition_id uuid REFERENCES float_parameter (id) NOT NULL,\n" +
             "  is_left_open boolean NOT NULL,\n" +
             "  is_right_open boolean NOT NULL,\n" +
             "  lower double precision NOT NULL,\n" +
@@ -200,7 +200,7 @@ public class CreateTableSqlScript {
             "\n" +
             "-- changeset liquibaseuser:23\n" +
             "CREATE TABLE boolean_parameter (\n" +
-            "  parameter_type_definition_id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
+            "  id uuid PRIMARY KEY REFERENCES parameter_type_definition (id),\n" +
             "  default_value boolean\n" +
             ");\n" +
             "-- rollback DROP TABLE boolean_parameter;\n" +

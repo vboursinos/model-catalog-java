@@ -64,10 +64,10 @@ public class InsertParametersTables {
     String insertSQL =
         strDefaultValue != null
             ? String.format(
-                "INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES (%s, '%s');\n",
+                "INSERT INTO categorical_parameter(id, default_value) VALUES (%s, '%s');\n",
                 subQuery, strDefaultValue)
             : String.format(
-                "INSERT INTO categorical_parameter(parameter_type_definition_id, default_value) VALUES (%s, %s);\n",
+                "INSERT INTO categorical_parameter(id, default_value) VALUES (%s, %s);\n",
                 subQuery, strDefaultValue);
     sb.append(insertSQL);
   }
@@ -91,7 +91,7 @@ public class InsertParametersTables {
     }
     String insertSQL =
         String.format(
-            "INSERT INTO float_parameter(parameter_type_definition_id, default_value) VALUES (%s, %f);\n",
+            "INSERT INTO float_parameter(id, default_value) VALUES (%s, %f);\n",
             subQuery, floatDefaultValue);
     sb.append(insertSQL);
   }
@@ -117,7 +117,7 @@ public class InsertParametersTables {
     }
     String insertSQL =
         String.format(
-            "INSERT INTO integer_parameter(parameter_type_definition_id, default_value) VALUES (%s, %d);\n",
+            "INSERT INTO integer_parameter(id, default_value) VALUES (%s, %d);\n",
             subQuery, intDefaultValue);
     sb.append(insertSQL);
   }
@@ -139,7 +139,7 @@ public class InsertParametersTables {
     }
     String insertSQL =
         String.format(
-            "INSERT INTO boolean_parameter(parameter_type_definition_id, default_value) VALUES (%s, %b);\n",
+            "INSERT INTO boolean_parameter(id, default_value) VALUES (%s, %b);\n",
             subQuery, boolDefaultValue);
     sb.append(insertSQL);
   }
