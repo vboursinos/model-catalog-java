@@ -32,6 +32,8 @@ public class InsertStaticTables {
         extractUniqueValues(mapper, dirPath, InsertStaticTables::getModelTypes);
     Set<String> allModelStructureTypes =
         extractUniqueValues(mapper, dirPath, InsertStaticTables::getModelStructureTypes);
+    Set<String> allDependencyGroups =
+        extractUniqueValues(mapper, dirPath, InsertStaticTables::getDependencyGroupTypes);
     Set<String> allMlTasks = extractUniqueValues(mapper, dirPath, InsertStaticTables::getMlTasks);
     Set<String> allMetrics = extractUniqueValues(mapper, dirPath, InsertStaticTables::getMetrics);
 
@@ -48,6 +50,10 @@ public class InsertStaticTables {
         "8-DML-insert_model_structure_type.sql",
         buildInsertModelStructureTypeSQL(allModelStructureTypes));
     logger.info("Model structure type sql file is created successfully");
+    createSQLFile(
+            "11-DML-insert_dependency_group_type.sql",
+            buildInsertDependencyGroupTypeSQL(allDependencyGroups));
+    logger.info("Dependency group types sql file is created successfully");
     createSQLFile("7-DML-insert_ml_task.sql", buildInsertMlTaskSQL(allMlTasks));
     logger.info("Ml_task sql file is created successfully");
     createSQLFile("6-DML-insert_metrics.sql", buildMetricSQL(allMetrics));
@@ -107,6 +113,18 @@ public class InsertStaticTables {
     return modelStructureTypes;
   }
 
+  static Set<String> getDependencyGroupTypes(Models models) {
+    Set<String> dependencyGroups = new HashSet<>();
+    for (Model model : models.getModels()) {
+      if (model.getMetadata().getDependencyGroup() == null) {
+        continue;
+      }
+      String dependencyGroup = model.getMetadata().getDependencyGroup();
+      dependencyGroups.add(dependencyGroup);
+    }
+    return dependencyGroups;
+  }
+
   static Set<String> getMlTasks(Models models) {
     Set<String> mlTaskSet = new HashSet<>();
     for (Model model : models.getModels()) {
@@ -141,6 +159,16 @@ public class InsertStaticTables {
       sb.append("INSERT INTO model_structure_type(name) VALUES ('")
           .append(modelStructureType)
           .append("');\n");
+    }
+    return sb.toString();
+  }
+
+  static String buildInsertDependencyGroupTypeSQL(Set<String> dependencyGroupTypes) {
+    StringBuilder sb = new StringBuilder();
+    for (String dependencyGroupType : dependencyGroupTypes) {
+      sb.append("INSERT INTO dependency_group_type(name) VALUES ('")
+              .append(dependencyGroupType)
+              .append("');\n");
     }
     return sb.toString();
   }

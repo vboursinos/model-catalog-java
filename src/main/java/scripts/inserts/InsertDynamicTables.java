@@ -56,11 +56,11 @@ public class InsertDynamicTables {
     String sqlScript = buildInsertSQL(models);
     String num;
     if (mltask.equals("classification")) {
-      num = "11";
-    } else if (mltask.equals("forecasting")) {
       num = "12";
-    } else {
+    } else if (mltask.equals("forecasting")) {
       num = "13";
+    } else {
+      num = "14";
     }
     FileUtils.writeToFile(
         Paths.get(SQL_DIR_PATH, String.format("%s-DML-insert_models_%s.sql",num, mltask)).toString(),

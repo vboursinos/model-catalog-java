@@ -12,6 +12,7 @@ public class Metadata {
   private String displayName;
   private Support supports;
   private String structure;
+  private String dependencyGroup;
 
   public Metadata() {}
 
@@ -86,4 +87,13 @@ public class Metadata {
   public void setStructure(String structure) {
     this.structure = structure;
   }
+
+  public String getDependencyGroup() {
+      return dependencyGroup;
+  }
+
+  public void setDependencyGroup(String dependencyGroup) {
+      this.dependencyGroup = dependencyGroup;
+  }
+
 }

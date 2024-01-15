@@ -22,7 +22,7 @@ public class InsertModelTable {
     }
 
     return String.format(
-        "INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, ensemble_type_id, family_type_id, decision_tree, model_type_id) VALUES ('%s', (select id from ml_task_type where name='%s'),'%s', '%s', (select id from model_structure_type where name='%s'), '%s', '%s', %b, (select id from model_ensemble_type where name='%s'),(select id from model_family_type where name='%s'), %b, (select id from model_type where name='%s'));\n",
+        "INSERT INTO model(name, ml_task_id, description, display_name, structure_id, advantages, disadvantages, enabled, ensemble_type_id, family_type_id, decision_tree, model_type_id, dependency_group_id) VALUES ('%s', (select id from ml_task_type where name='%s'),'%s', '%s', (select id from model_structure_type where name='%s'), '%s', '%s', %b, (select id from model_ensemble_type where name='%s'),(select id from model_family_type where name='%s'), %b, (select id from model_type where name='%s'), (select id from dependency_group_type where name='%s'));\n",
         model.getName(),
         model.getMlTask(),
         model.getMetadata().getModelDescription(),
@@ -34,7 +34,8 @@ public class InsertModelTable {
         ensembleType,
         familyType,
         model.getMetadata().getSupports().getDecisionTree(),
-        model.getMetadata().getModelType().get(0));
+        model.getMetadata().getModelType().get(0),
+        model.getMetadata().getDependencyGroup());
   }
 
   public static String buildInsertIntoModelToGroupSQL(String name, List<String> modelGroups) {
