@@ -51,8 +51,8 @@ public class InsertStaticTables {
         buildInsertModelStructureTypeSQL(allModelStructureTypes));
     logger.info("Model structure type sql file is created successfully");
     createSQLFile(
-            "11-DML-insert_dependency_group_type.sql",
-            buildInsertDependencyGroupTypeSQL(allDependencyGroups));
+        "11-DML-insert_dependency_group_type.sql",
+        buildInsertDependencyGroupTypeSQL(allDependencyGroups));
     logger.info("Dependency group types sql file is created successfully");
     createSQLFile("7-DML-insert_ml_task.sql", buildInsertMlTaskSQL(allMlTasks));
     logger.info("Ml_task sql file is created successfully");
@@ -167,8 +167,8 @@ public class InsertStaticTables {
     StringBuilder sb = new StringBuilder();
     for (String dependencyGroupType : dependencyGroupTypes) {
       sb.append("INSERT INTO dependency_group_type(name) VALUES ('")
-              .append(dependencyGroupType)
-              .append("');\n");
+          .append(dependencyGroupType)
+          .append("');\n");
     }
     return sb.toString();
   }

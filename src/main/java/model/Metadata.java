@@ -1,7 +1,6 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -92,11 +91,10 @@ public class Metadata {
   }
 
   public String getDependencyGroup() {
-      return dependencyGroup;
+    return dependencyGroup;
   }
 
   public void setDependencyGroup(String dependencyGroup) {
-      this.dependencyGroup = dependencyGroup;
+    this.dependencyGroup = dependencyGroup;
   }
-
 }
