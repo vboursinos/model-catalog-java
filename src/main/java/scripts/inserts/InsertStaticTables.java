@@ -34,6 +34,9 @@ public class InsertStaticTables {
         extractUniqueValues(mapper, dirPath, InsertStaticTables::getModelStructureTypes);
     Set<String> allDependencyGroups =
         extractUniqueValues(mapper, dirPath, InsertStaticTables::getDependencyGroupTypes);
+
+    Set<String> allDependencies =
+            extractUniqueValues(mapper, dirPath, InsertStaticTables::getDependencyGroupTypes);
     Set<String> allMlTasks = extractUniqueValues(mapper, dirPath, InsertStaticTables::getMlTasks);
     Set<String> allMetrics = extractUniqueValues(mapper, dirPath, InsertStaticTables::getMetrics);
 
@@ -60,6 +63,10 @@ public class InsertStaticTables {
     logger.info("Metrics sql file is created successfully");
     createSQLFile("4-DML-insert_ensemble_family.sql", buildInsertEnsembleFamilyTypeSQL());
     logger.info("Ensemble type and family type sql files are created successfully");
+    createSQLFile(
+            "12-DML-insert_dependency_type.sql",
+            buildInsertDependenciesTypeSQL());
+    logger.info("Dependency types sql file is created successfully");
   }
 
   private void createSQLFile(String fileName, String content) {
@@ -211,6 +218,31 @@ public class InsertStaticTables {
         sb.append("INSERT INTO model_family_type(name) VALUES ('")
             .append(familyType)
             .append("');\n");
+      }
+    } catch (IOException e) {
+      logger.error("Error reading ensemble-family.json file: " + e.getMessage(), e);
+    }
+    return sb.toString();
+  }
+
+  static String buildInsertDependenciesTypeSQL() {
+    String filePath = Paths.get("static","group_dependencies.json").toString();
+    ObjectMapper objectMapper = new ObjectMapper();
+    StringBuilder sb = new StringBuilder();
+    try {
+      Map<String,List<String>> groupDependencyMap =
+              objectMapper.readValue(new File(filePath), new TypeReference<Map<String,List<String>>>() {});
+      System.out.println(groupDependencyMap);
+      for (Map.Entry<String,List<String>> entry : groupDependencyMap.entrySet()) {
+        String key = entry.getKey();
+        List<String> value = entry.getValue();
+        for (String val : value) {
+          sb.append("INSERT INTO dependency_type(name,dependency_group_id) VALUES ('")
+                  .append(val)
+                  .append("',(select id from dependency_group_type where name='")
+                  .append(key)
+                  .append("'));\n");
+        }
       }
     } catch (IOException e) {
       logger.error("Error reading ensemble-family.json file: " + e.getMessage(), e);
