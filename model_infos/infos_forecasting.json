@@ -1,0 +1,2074 @@
+{
+  "models": [
+    {
+      "name": "linear_regression_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [
+        "fast",
+        "explainable"
+      ],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "lags",
+          "label": "Lags",
+          "description": "The number of lagged observations of the target series to use as input features.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 5,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "lags_past_covariates",
+          "label": "Last Past Covariates",
+          "description": "The number of lagged past covariates to use as input features.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 5,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "output_chunk_length",
+          "label": "Output Chunk Length",
+          "description": "Specifies the number of time steps forecasted at once, with these forecasts then used as input for generating the next set of predictions in an autoregressive manner when forecasting over long horizons.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 21
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 5,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "fit_intercept",
+          "label": "Fit Intercept",
+          "description": "Whether or not to fit the intercept term.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "False",
+                "True"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": true,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "linear_regression_forecaster",
+        "modelDescription": "The Linear Regression forecaster from the darts library is a statistical method used to predict a dependent variable (target) based on the values of independent variables (features). The model assumes a linear relationship between the input variables and the output. The model's strength lies in its simplicity and interpretability. It can be used to understand the impact of several independent variables on the outcome of a dependent variable. Linear Regression is widely used in various fields, including economics, computer science, and the social sciences.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Simplicity: Linear Regression is straightforward to understand and explain, making it a good model for beginners.",
+          "Interpretability: Each feature used in the model gets its own coefficient which tells its importance in the prediction.",
+          "Speed: Linear Regression is computationally inexpensive compared to more complex models and hence, is useful for large datasets."
+        ],
+        "disadvantages": [
+          "Assumptions: Linear Regression assumes a linear relationship between features and target variable, which is not always the case.",
+          "Outliers: The model is sensitive to outliers which can have a large influence on the line of best fit.",
+          "Overfitting: With many features, the model can become complex and may overfit the training data, resulting in poor performance on unseen data."
+        ],
+        "prime": [],
+        "displayName": "Linear Regression Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nbeats_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [
+        "advanced"
+      ],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "activation",
+          "label": "Activation Function",
+          "description": "The activation function applied in the N-BEATS forecaster neural network layers.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "RReLU",
+                "ReLU",
+                "SELU",
+                "PReLU",
+                "Softplus",
+                "Sigmoid",
+                "LeakyReLU",
+                "Tanh"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": "ReLU",
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "dropout",
+          "label": "Dropout Rate",
+          "description": "The dropout rate applied to the N-BEATS forecaster neural network layers to prevent overfitting.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": null,
+            "floatSet": {
+              "intervals": [
+                {
+                  "left": true,
+                  "right": true,
+                  "lower": 0.0,
+                  "upper": 1.0
+                }
+              ]
+            }
+          },
+          "enabled": false,
+          "defaultValue": 0.0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": "uniform",
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "expansion_coefficient_dim",
+          "label": "Expansion Coefficient Dimension",
+          "description": "The dimension of the expansion coefficients in the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 101
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 5,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "n_epochs",
+          "label": "Number of Epochs",
+          "description": "The number of times the N-BEATS forecaster model is trained on the entire dataset.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 501
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 10,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "generic_architecture",
+          "label": "Generic Architecture",
+          "description": "Use a generic architecture for the N-BEATS forecaster model instead of a specialized one.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "False",
+                "True"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": true,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "input_chunk_length",
+          "label": "Input Chunk Length",
+          "description": "The length of the input time series chunks used by the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 101
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 5,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "layer_widths",
+          "label": "Layer Widths",
+          "description": "The width of the neural network layers in the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 1025
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 256,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "num_stacks",
+          "label": "Number of Stacks",
+          "description": "The number of stacks in the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 101
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 30,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "num_blocks",
+          "label": "Number of Blocks",
+          "description": "The number of blocks per stack in the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 11
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "num_layers",
+          "label": "Number of Layers",
+          "description": "The number of layers per block in the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 11
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 4,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "output_chunk_length",
+          "label": "Output Chunk Length",
+          "description": "The length of the output time series chunks produced by the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 101
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 5,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "trend_polynomial_degree",
+          "label": "Trend Polynomial Degree",
+          "description": "The degree of the polynomial used to model the trend component in the N-BEATS forecaster model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 11
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 2,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nbeats_forecaster",
+        "modelDescription": "The N-BEATS (Neural basis expansion analysis for interpretable time series forecasting) forecaster from the darts library is a state-of-the-art deep learning model designed to produce accurate and interpretable time series predictions. This model employs a unique combination of stacked fully connected layers and basis function expansion, which enables it to learn a diverse range of time series patterns. The architecture consists of two primary components: the backcast and forecast branches, both of which are designed to produce predictions for past and future time steps, respectively. The model's primary strength lies in its ability to learn interpretable components, which provide valuable insights into the underlying structure and characteristics of the time series data. N-BEATS has demonstrated exceptional performance across a wide array of forecasting tasks and outperformed traditional methods as well as other deep learning models in numerous benchmarks.",
+        "modelType": [
+          "Deep Learning Model"
+        ],
+        "advantages": [
+          "High accuracy: N-BEATS consistently achieves superior performance compared to traditional methods and other deep learning models.",
+          "Interpretability: The model's ability to learn interpretable components offers valuable insights into the underlying structure of time series data.",
+          "Flexibility: N-BEATS can adapt to a wide range of time series patterns, making it suitable for diverse forecasting tasks.",
+          "Scalability: The model can be easily scaled to handle large datasets or high-dimensional input features."
+        ],
+        "disadvantages": [
+          "Requires large amounts of training data: N-BEATS requires a large amount of training data to learn the underlying patterns in the data.Computational complexity: N-BEATS may require considerable computational resources for training, especially for large datasets or complex models.",
+          "Risk of overfitting: Like any deep learning model, N-BEATS can overfit the training data, which may result in reduced performance on unseen data.",
+          "Limited interpretability compared to some traditional methods: Although N-BEATS offers some level of interpretability, it may not be as transparent as simpler models like ARIMA or exponential smoothing.",
+          "Dependency on quality of input data: The model's performance depends heavily on the quality and relevance of the input features used for training."
+        ],
+        "prime": [],
+        "displayName": "N-BEATS Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_arima_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "D",
+          "label": "D",
+          "description": "The degree of seasonal differencing.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 2
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "P",
+          "label": "P",
+          "description": "The order of the seasonal autoregressive term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 3
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "Q",
+          "label": "Q",
+          "description": "The order of the seasonal moving average term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 3
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "d",
+          "label": "d",
+          "description": "The degree of differencing.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 3
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "p",
+          "label": "p",
+          "description": "The order of the autoregressive term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 6
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "q",
+          "label": "q",
+          "description": "The order of the moving average term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 6
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "season_length",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "include_mean",
+          "label": "Include Mean",
+          "description": "Whether or not to include a mean term.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "False",
+                "True"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": true,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "include_drift",
+          "label": "Include Drift",
+          "description": "Whether or not to include a drift term.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "False",
+                "True"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": false,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "blambda",
+          "label": "Box-Cox Lambda",
+          "description": "The Box-Cox transformation parameter.",
+          "domain": {
+            "integerSet": {
+              "ranges": []
+            },
+            "categoricalSet": {
+              "categories": [
+                "None"
+              ]
+            },
+            "floatSet": {
+              "intervals": [
+                {
+                  "left": true,
+                  "right": false,
+                  "lower": 0.0,
+                  "upper": 2.0
+                }
+              ]
+            }
+          },
+          "enabled": false,
+          "defaultValue": "None",
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": "uniform",
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "biasadj",
+          "label": "Bias Adjustment",
+          "description": "Use adjusted back-transformed mean Box-Cox.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "False",
+                "True"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": false,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_arima_forecaster",
+        "modelDescription": "ARIMA stands for AutoRegressive Integrated Moving Average. This model consists of three main components: AR (p), I (d), and MA (q). AR is the autoregressive component, I is the integrated component, and MA is the moving average component. Unlike the Auto ARIMA model, the ARIMA model does not automatically conduct a search over possible model parameters to select the best fit. This is best for users who want full control of the model.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Interpretability: ARIMA models are generally more interpretable than some complex machine learning models.",
+          "Versatility: ARIMA is capable of modeling a wide range of time series data with different characteristics.",
+          "Incorporation of trend and seasonality: The model can handle trend and seasonality in the time series data."
+        ],
+        "disadvantages": [
+          "Stationarity assumption: ARIMA models assume that the time series is stationary. This might not be the case for all types of time series data.",
+          "Manual tuning: Unlike Auto ARIMA, ARIMA requires manual specification of the model parameters, which can be a complex and time-consuming process.",
+          "Predictive performance: While ARIMA can be effective, it might not always provide the best predictive performance compared to some machine learning models.",
+          "Dependence on historical data: Like other time series forecasting models, ARIMA's performance heavily depends on the historical data used for training."
+        ],
+        "prime": [],
+        "displayName": "ARIMA Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_auto_arima_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [
+        "explainable"
+      ],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "ic",
+          "label": "Information Criterion",
+          "description": "The information criterion used to find the best SARIMAX model.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "aic",
+                "aicc",
+                "bic"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": "aicc",
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "season_length",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_auto_arima_forecaster",
+        "modelDescription": "The Auto ARIMA forecaster an automated version of the ARIMA model, known for its ability to handle different types of time series data. Auto ARIMA works by conducting a search over possible model parameters to select the best fit that minimizes the AIC, BIC, or other user-defined criteria. It then uses the best parameters to generate forecasts. Auto ARIMA has the ability to incorporate seasonal patterns, trend, and other components into its model, making it a versatile tool for time series forecasting.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Automated model selection: Auto ARIMA automatically finds the best ARIMA model parameters, reducing the need for manual tuning.",
+          "Versatility: Auto ARIMA is capable of modeling a wide range of time series data with different characteristics.",
+          "Incorporation of seasonal patterns: The model can handle seasonality in the time series data.",
+          "Interpretability: ARIMA models, including Auto ARIMA, are generally more interpretable than some complex machine learning models."
+        ],
+        "disadvantages": [
+          "Stationarity assumption: ARIMA models assume that the time series is stationary. This might not be the case for all types of time series data.",
+          "Computational intensity: The process of finding the best model parameters can be computationally intensive, especially for large datasets.",
+          "Predictive performance: While Auto ARIMA can be effective, it might not always provide the best predictive performance compared to some machine learning models.",
+          "Dependence on historical data: Like other time series forecasting models, Auto ARIMA's performance heavily depends on the historical data used for training."
+        ],
+        "prime": [],
+        "displayName": "Auto ARIMA Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_auto_ces_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [
+        "advanced"
+      ],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "season_length",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_auto_ces_forecaster",
+        "modelDescription": "The Auto CES forecaster is an automated version of the CES model, known for its ability to handle complex seasonality in time series data. Auto CES works by conducting a search over possible model parameters to select the best fit that minimizes the AIC, BIC, or other user-defined criteria. It then uses the best parameters to generate forecasts. Auto CES has the ability to incorporate complex seasonal patterns, trend, and other components into its model, making it a versatile tool for time series forecasting.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Automated model selection: Auto CES automatically finds the best CES model parameters, reducing the need for manual tuning.",
+          "Versatility: Auto CES is capable of modeling a wide range of time series data with complex seasonal patterns.",
+          "Incorporation of seasonal patterns: The model can handle complex seasonality in the time series data.",
+          "Interpretability: CES models, including Auto CES, are generally more interpretable than some complex machine learning models."
+        ],
+        "disadvantages": [
+          "Computational intensity: The process of finding the best model parameters can be computationally intensive, especially for large datasets.",
+          "Dependence on historical data: Like other time series forecasting models, Auto CES's performance heavily depends on the quality of historical data used for training."
+        ],
+        "prime": [],
+        "displayName": "Auto CES Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_auto_ets_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [
+        "fast",
+        "explainable"
+      ],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "season_length",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_auto_ets_forecaster",
+        "modelDescription": "The Auto ETS forecaster is an automated version of the ETS model, known for its ability to handle different types of time series data. Auto ETS works by conducting a search over possible model parameters to select the best fit that minimizes the AIC, BIC, or other user-defined criteria. It then uses the best parameters to generate forecasts. Auto ETS has the ability to incorporate seasonal patterns, trend, and other components into its model, making it a versatile tool for time series forecasting.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Automated model selection: Auto ETS automatically finds the best ETS model parameters, reducing the need for manual tuning.",
+          "Versatility: Auto ETS is capable of modeling a wide range of time series data with different characteristics.",
+          "Incorporation of seasonal patterns: The model can handle seasonality in the time series data.",
+          "Interpretability: ETS models, including Auto ETS, are generally more interpretable than some complex machine learning models."
+        ],
+        "disadvantages": [
+          "Computational intensity: The process of finding the best model parameters can be computationally intensive, especially for large datasets.",
+          "Dependence on historical data: Like other time series forecasting models, Auto ETS's performance heavily depends on the quality of the historical data used for training."
+        ],
+        "prime": [],
+        "displayName": "Auto ETS Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_auto_theta_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "season_length",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "decomposition_type",
+          "label": "Decomposition Type",
+          "description": "The type of seasonal decomposition to use.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "additive",
+                "multiplicative"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": "multiplicative",
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_auto_theta_forecaster",
+        "modelDescription": "The Auto Theta Model is a forecasting tool that automatically selects the most suitable Theta model variant for time series forecasting, based on Mean Squared Error (MSE). The Theta model, known for its effectiveness and simplicity, decomposes a time series into long-term and short-term components, making use of a parameter called theta to modify the local curvature of the series. The Auto Theta Model considers four different Theta models: the Standard Theta Model (STM), the Optimized Theta Model (OTM), the Dynamic Standard Theta Model (DSTM), and the Dynamic Optimized Theta Model (DOTM). By automatically selecting the best model among these, it provides an efficient way to generate accurate forecasts tailored to the specific characteristics of the given time series data.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Automated model selection: The Auto Theta Model automatically selects the best Theta model (STM, OTM, DSTM, DOTM) based on Mean Squared Error (MSE), eliminating the need for manual model selection and potentially improving forecast accuracy.",
+          "Simplicity: Like the base Theta model, the Auto Theta Model is simple to implement and understand, making it accessible for users with varying degrees of expertise.",
+          "Adaptability: The Auto Theta Model can adapt to different characteristics of the time series data by choosing the most appropriate Theta model variant."
+        ],
+        "disadvantages": [
+          "Assumptions: The model implicitly assumes that the time series can be decomposed into stable components, is forecastable based on past data, and that the deseasonalized and detrended residuals are stationary, which may not hold true for all types of data.",
+          "Overfitting: Since the Auto Theta Model selects the best model based on MSE, it may overfit to the training data and perform poorly on unseen data.",
+          "Lack of control: While the Auto Theta Model's automatic model selection can be an advantage, it can also be a disadvantage for users who want more control over model selection and parameter tuning."
+        ],
+        "prime": [],
+        "displayName": "Auto Theta Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_garch_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "p",
+          "label": "p",
+          "description": "The order of the GARCH terms (past conditional variances or lagged forecast errors in variance) in the GARCH(p, q) model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 4
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "q",
+          "label": "q",
+          "description": "The order of the ARCH terms (past squared error terms or lagged squared residuals from the mean equation) in the GARCH(p, q) model.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 4
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_garch_forecaster",
+        "modelDescription": "The GARCH Forecaster is a statistical model used for forecasting volatility in time series data. It is particularly useful when the variance of the error term is believed to be serially autocorrelated. This model is commonly used in financial and economic analyses to estimate volatility of returns for stocks, bonds, and market indices. It assumes the variance of the error term follows an autoregressive moving average process, enabling it to account for time-varying volatility in the data.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Captures Volatility Clustering: GARCH models are adept at capturing the 'volatility clustering' phenomena often observed in financial time series data, allowing for more accurate modeling and forecasting of financial markets.",
+          "Explainability: GARCH models provide a theoretically sound framework for understanding volatility dynamics, which can be valuable for researchers and practitioners when interpreting the results."
+        ],
+        "disadvantages": [
+          "Difficulty in selecting p and q Parameters: Choosing the correct lag orders (p and q) can be challenging and often requires domain expertise or model selection techniques, adding to the complexity of model deployment.",
+          "Constant Mean Requirement: The model assumes that the mean of the time series is constant over the time period being considered, which may not hold true for all types of data, thereby affecting the model's accuracy."
+        ],
+        "prime": [],
+        "displayName": "GARCH Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_historic_average_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_historic_average_forecaster",
+        "modelDescription": "The Historic Average Forecaster is a forecasting model that uses past data to predict future outcomes. By calculating the historic average of the given time series data, it provides a simple and straightforward forecast for future periods.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Simplicity: This model is easy to understand and implement.",
+          "No need for additional data: Unlike other complex models, the historic average forecaster does not require additional variables or complex parameters for forecasting.",
+          "Stability: Because it uses the average of past data, it provides a stable forecast, which is less sensitive to recent changes or fluctuations in the data."
+        ],
+        "disadvantages": [
+          "Ignoring trends: This model assumes that the past will continue in the same way, which might not always be the case. It doesn't account for trends, seasonality, or other patterns in the data.",
+          "No consideration for recent changes: The model might not respond quickly to recent changes in the data as it uses the average of all past data.",
+          "Simplicity can be a drawback: Although its simplicity is an advantage, it can also be a drawback. For complex datasets with intricate patterns, the historic average forecaster might not provide the most accurate forecasts."
+        ],
+        "prime": [],
+        "displayName": "Historic Average Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_random_walk_with_drift_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_random_walk_with_drift_forecaster",
+        "modelDescription": "The Random Walk with Drift Forecaster is a variation of the naive method that allows forecasts to change over time. The amount of change, referred to as drift, is calculated as the average change observed in the historical data. Essentially, this model is equivalent to drawing a line between the first and last observation and extrapolating this line to make future forecasts.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Ability to adapt: Unlike the naive method, this model allows forecasts to change over time, potentially providing better forecasts when there is a consistent trend in the data.",
+          "Simplicity: This model is easy to understand and implement, only requiring the calculation of the average change in the historical data."
+        ],
+        "disadvantages": [
+          "Assumption of linearity: This model assumes that the change over time is linear, which might not always be the case in real-world data.",
+          "No consideration for sudden changes: The model might not respond quickly to sudden changes in the data as it uses the average change over all past data."
+        ],
+        "prime": [],
+        "displayName": "Random Walk with Drift Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_seasonal_naive_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [
+        "fast",
+        "explainable"
+      ],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "season_length",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_seasonal_naive_forecaster",
+        "modelDescription": "The Naive Forecaster is a forecasting model that simply sets all forecasts to be the value of the last observation. This is the simplest method of forecasting, making no assumptions about the data and only using the last observed value to predict future outcomes. Seasonality can be incorporated by setting the `season_length` parameter.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Ability to capture seasonality: This model can capture seasonal variations by using the last known observation of the same period.",
+          "Simplicity: This model is easy to understand and implement, only requiring the last observed value from the same season to make a prediction."
+        ],
+        "disadvantages": [
+          "Lack of sophistication: This model does not consider any patterns or trends outside of seasonality in the data.",
+          "Inaccuracy: The seasonal naive forecaster can be very inaccurate if the data frequently changes or has a clear trend outside of seasonality.",
+          "No consideration for recent changes: The model will not respond to recent changes in the data, as it only uses the last observed value from the same season."
+        ],
+        "prime": [],
+        "displayName": "Naive Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "nixtla_seasonal_window_average_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": false,
+      "hyperParameters": [
+        {
+          "name": "season_length",
+          "label": "Season Length",
+          "description": "Number of steps in a seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 6
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "window_size",
+          "label": "Window Size",
+          "description": "Number of previous steps used to calculate the average.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 6
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "nixtla_seasonal_window_average_forecaster",
+        "modelDescription": "The Window Average Forecaster is a model that uses the average of the last 'window_length' observations from the same period, where 'window_length' is the length of the window. Seasonality can also be captured by specifying the seasonal period.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Ability to capture seasonality: This model can capture seasonal variations by using the average of the last 'window_length' observations from the same period.",
+          "Flexibility: The window length can be adjusted to focus on global or local trends.",
+          "Simplicity: This model is straightforward to understand and implement, only requiring the calculation of the average of a number of past observations from the same period."
+        ],
+        "disadvantages": [
+          "Lack of sophistication: This model does not consider any patterns or trends outside of the seasonal window in the data.",
+          "Inaccuracy: The seasonal window average forecaster can be inaccurate if the data frequently changes or has a clear trend that extends beyond the seasonal window length.",
+          "No consideration for recent changes: The model will not respond to recent changes in the data outside of the seasonal window."
+        ],
+        "prime": [],
+        "displayName": "Window Average Forecaster",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "naive_last_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "sp",
+          "label": "Seasonal periodicity.",
+          "description": "The number steps in the series which make up one seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": true,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "naive_last_forecaster",
+        "modelDescription": "The naive last value forecaster provides a baseline forecast by predicting future values using the previous values. A seasonal offset can be included.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Can be used as a benchmark.",
+          "Fast training time.",
+          "Easy to understand and interpret."
+        ],
+        "disadvantages": [
+          "Does not make use of exogenous features.",
+          "Does not look for any correlations or relationships in the data."
+        ],
+        "prime": [],
+        "displayName": "Naive Forecaster: Last Value",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "auto_ets_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "sp",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 53
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "auto_ets_forecaster",
+        "modelDescription": "ETS (Error, Trend, Seasonality) forecasting is a method of time series forecasting that decomposes a time series into three components:\n\nError: represents the random fluctuations or noise in the data, which cannot be explained by the trend or seasonality.\n\nTrend: represents the overall direction (upward or downward) of the time series\n\nSeasonality: represents the periodic fluctuations in the time series (e.g. monthly, quarterly, annually)\n\nThere are several variations of the ETS forecasting method, including ETS(A,N,N) (additive error, no trend, no seasonality), ETS(M,N,N) (multiplicative error, no trend, no seasonality), and ETS(A,A,N) (additive error and trend, no seasonality). These variations are used depending on the characteristics of the time series data. \n\nThe <a href=\"https://www.sktime.org/en/stable/api_reference/auto_generated/sktime.forecasting.ets.AutoETS.html\" target=\"_blank\">AutoETS</a> model automatically chooses these hyperparameters including also damping of trend, and transformation of the data, among other things, by using the <a href=\"https://en.wikipedia.org/wiki/Akaike_information_criterion\" target=\"_blank\">Akaike Information Criterion (AIC)</a>. If you know the seasonality of your data, please fix it to the desired value, otherwise, make it tunable. Note by default the model assumes no seasonality in the data. For example, if you make the model tunable, it may determine that a time series of monthly sales data has a linear trend, a quarterly seasonality, and a Gaussian error term, and use these hyperparameters to generate forecasts.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Robust",
+          "Widely used",
+          "Explainable",
+          "May produce forecasts from noisy data"
+        ],
+        "disadvantages": [
+          "Forecasts lag behind the actual trend"
+        ],
+        "prime": [],
+        "displayName": "Auto ETS",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "naive_drift_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "window_length",
+          "label": "Window length",
+          "description": "The size of the window over which to calculate a rolling mean.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 21
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": true,
+          "defaultValue": 10,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "naive_drift_forecaster",
+        "modelDescription": "The naive drift forecaster provides a baseline forecast by predicting future values using the trend over a window of previous values.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Can be used as a benchmark.",
+          "Fast training time.",
+          "Easy to understand and interpret."
+        ],
+        "disadvantages": [
+          "Does not make use of exogenous features.",
+          "Does not look for any correlations or relationships in the data."
+        ],
+        "prime": [],
+        "displayName": "Naive Forecaster: Drift",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "auto_arima_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "information_criterion",
+          "label": "Information Criterion",
+          "description": "The information criterion used to find the best SARIMAX model.",
+          "domain": {
+            "integerSet": null,
+            "categoricalSet": {
+              "categories": [
+                "aic",
+                "hqic",
+                "bic",
+                "oob"
+              ]
+            },
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": "aic",
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": null
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "sp",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "auto_arima_forecaster",
+        "modelDescription": "Auto SARIMAX is a machine learning model that can be used to automatically fit a Seasonal Autoregressive Integrated Moving Average with Exogenous Regressors (SARIMAX) model to a time series. It is a variant of the SARIMAX model that uses an automated process to search for the optimal values of the model parameters, rather than requiring the user to specify these values manually.\n\nAuto SARIMAX is often used when there is a need to quickly fit a SARIMAX model to a time series data set without extensive manual parameter tuning. It can be especially useful when working with large data sets or when there is limited time available to optimize the model parameters.\n\nOne of the main advantages of Auto SARIMAX is that it can significantly reduce the amount of time and effort required to fit a SARIMAX model to a time series data set.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Automatically finds model parameters.",
+          "Can handle non-stationary data. They can account for trends and seasonality in the data.",
+          "Widely used and well-established, so there is a wide body of resources available for understanding and using these models.",
+          "Simple and easy to implement."
+        ],
+        "disadvantages": [
+          "Can require significant computational resources to fit.",
+          "May not always find the optimal model parameters."
+        ],
+        "prime": [],
+        "displayName": "Auto SARIMAX",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "naive_mean_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "window_length",
+          "label": "Window length",
+          "description": "The size of the window over which to calculate a rolling mean.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 21
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": true,
+          "defaultValue": 10,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "naive_mean_forecaster",
+        "modelDescription": "The naive rolling mean forecaster provides a baseline forecast by predicting future values using a rolling mean of past values.",
+        "modelType": [
+          "Baseline Model"
+        ],
+        "advantages": [
+          "Can be used as a benchmark.",
+          "Fast training time.",
+          "Easy to understand and interpret."
+        ],
+        "disadvantages": [
+          "Does not make use of exogenous features.",
+          "Does not take into account seasonality.",
+          "Does not look for any correlations or relationships in the data."
+        ],
+        "prime": [],
+        "displayName": "Naive Forecaster: Rolling Mean",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    },
+    {
+      "name": "arima_forecaster",
+      "mlTask": "forecasting",
+      "incompatibleMetrics": [
+        "classification-log-loss",
+        "classification-roc"
+      ],
+      "groups": [],
+      "blackListed": true,
+      "hyperParameters": [
+        {
+          "name": "D",
+          "label": "D",
+          "description": "The degree of seasonal differencing.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 2
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "P",
+          "label": "P",
+          "description": "The order of the seasonal autoregressive term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 3
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "Q",
+          "label": "Q",
+          "description": "The order of the seasonal moving average term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 3
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "d",
+          "label": "d",
+          "description": "The degree of differencing.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 3
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "p",
+          "label": "p",
+          "description": "The order of the autoregressive term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 6
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "q",
+          "label": "q",
+          "description": "The order of the moving average term.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 0,
+                  "stop": 6
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 0,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        },
+        {
+          "name": "sp",
+          "label": "Seasonal Period",
+          "description": "The number of time steps in a complete seasonal cycle.",
+          "domain": {
+            "integerSet": {
+              "ranges": [
+                {
+                  "start": 1,
+                  "stop": 13
+                }
+              ]
+            },
+            "categoricalSet": null,
+            "floatSet": null
+          },
+          "enabled": false,
+          "defaultValue": 1,
+          "constraint": false,
+          "constraintInformation": null,
+          "distribution": {
+            "categoricalDistribution": null,
+            "floatDistribution": null,
+            "integerDistribution": "uniform"
+          },
+          "fixedValue": false
+        }
+      ],
+      "constraintEdges": [],
+      "metadata": {
+        "model": "arima_forecaster",
+        "modelDescription": "The Seasonal Autoregressive Integrated Moving Average with Exogenous Regressors (SARIMAX) model is a statistical model that can be used to analyze and forecast time series data that exhibits seasonal patterns and includes exogenous variables (variables that are not part of the time series we are forecasting).\n\nA SARIMAX model is specified by seven parameters: p, d, q, P, D, Q and m. The p, d, and q parameters specify the order of the autoregressive term, the degree of differencing, and the order of the moving average term, respectively. The P, D, and Q parameters are similar, but are used to model the seasonal patterns in the data. Finally m specifies the number of time steps in a seasonal period.\n\nIn addition to these parameters, a SARIMAX model also includes one or more exogenous variables that are used to model the effects of external factors on the time series.",
+        "modelType": [
+          "Statistical Model"
+        ],
+        "advantages": [
+          "Can handle non-stationary data. They can account for trends and seasonality in the data.",
+          "Widely used and well-established, so there is a wide body of resources available for understanding and using these models.",
+          "Simple and easy to implement."
+        ],
+        "disadvantages": [
+          "Can require significant computational resources to fit."
+        ],
+        "prime": [],
+        "displayName": "SARIMAX",
+        "supports": {
+          "probabilities": false,
+          "decisionTree": false,
+          "featureImportance": false
+        },
+        "structure": "base"
+      }
+    }
+  ]
+}
