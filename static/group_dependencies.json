@@ -1,0 +1,39 @@
+{
+  "base": [],
+  "catboost": [
+    "catboost"
+  ],
+  "darts": [
+    "darts",
+    "tensorboardx",
+    "holidays",
+    "ipython"
+  ],
+  "huggingface": [
+    "transformers",
+    "datasets"
+  ],
+  "intelex": [
+    "scikit-learn-intelex"
+  ],
+  "lightgbm": [
+    "lightgbm"
+  ],
+  "lightning": [
+    "sklearn-contrib-lightning"
+  ],
+  "stacking": [
+    "mrmr-selection",
+    "polars"
+  ],
+  "statsforecast": [
+    "statsforecast"
+  ],
+  "sktime": [
+    "sktime",
+    "pmdarima"
+  ],
+  "xgboost": [
+    "xgboost"
+  ]
+}
