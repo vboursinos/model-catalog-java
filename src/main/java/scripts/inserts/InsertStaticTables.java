@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -22,6 +23,8 @@ public class InsertStaticTables {
   private static final Logger logger = LogManager.getLogger(InsertStaticTables.class);
   private static final String JSON_DIR_PATH = "model_infos";
   private static final String SQL_DIR_PATH = "sql_scripts";
+
+  private static int rev = 1;
 
   public void insertDataScripts() {
     ObjectMapper mapper = new ObjectMapper();
@@ -130,7 +133,23 @@ public class InsertStaticTables {
   static String buildInsertModelTypeSQL(Set<String> modelTypes) {
     StringBuilder sb = new StringBuilder();
     for (String modelType : modelTypes) {
+      String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+
       sb.append("INSERT INTO model_type(name) VALUES ('").append(modelType).append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO model_type_aud(id, rev, revtype, name) VALUES (")
+          .append("(select id from model_type where name = '")
+          .append(modelType)
+          .append("'),")
+          .append(rev)
+          .append(",0,'")
+          .append(modelType)
+          .append("');\n");
+      rev++;
     }
     return sb.toString();
   }
@@ -138,17 +157,45 @@ public class InsertStaticTables {
   static String buildInsertModelStructureTypeSQL(Set<String> modelStructureTypes) {
     StringBuilder sb = new StringBuilder();
     for (String modelStructureType : modelStructureTypes) {
+      String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
       sb.append("INSERT INTO model_structure_type(name) VALUES ('")
           .append(modelStructureType)
           .append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO model_structure_type_aud(id, rev, revtype, name) VALUES (")
+          .append("(select id from model_structure_type where name = '")
+          .append(modelStructureType)
+          .append("'),")
+          .append(rev)
+          .append(",0,'")
+          .append(modelStructureType)
+          .append("');\n");
+      rev++;
     }
     return sb.toString();
   }
 
   static String buildInsertMlTaskSQL(Set<String> mlTaskSet) {
     StringBuilder sb = new StringBuilder();
+    String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
     for (String mlTask : mlTaskSet) {
       sb.append("INSERT INTO ml_task_type(name) VALUES ('").append(mlTask).append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO ml_task_type_aud(id, rev, revtype) VALUES (")
+          .append("(select id from ml_task_type where name = '")
+          .append(mlTask)
+          .append("'),")
+          .append(rev)
+          .append(",0);\n");
+      rev++;
     }
     return sb.toString();
   }
@@ -156,7 +203,22 @@ public class InsertStaticTables {
   static String buildMetricSQL(Set<String> metricSet) {
     StringBuilder sb = new StringBuilder();
     for (String metric : metricSet) {
+      String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
       sb.append("INSERT INTO metric(name) VALUES ('").append(metric).append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO metric_aud(id, rev, revtype, name) VALUES (")
+          .append("(select id from metric where name = '")
+          .append(metric)
+          .append("'),")
+          .append(rev)
+          .append(",0,'")
+          .append(metric)
+          .append("');\n");
+      rev++;
     }
     return sb.toString();
   }
@@ -175,14 +237,40 @@ public class InsertStaticTables {
         familyTypes.add(model.getFamily());
       }
       for (String ensembleType : ensembleTypes) {
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
         sb.append("INSERT INTO model_ensemble_type(name) VALUES ('")
             .append(ensembleType)
             .append("');\n");
+        sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+            .append(rev)
+            .append(",'")
+            .append(timeStamp)
+            .append("');\n");
+        sb.append("INSERT INTO model_ensemble_type_aud(id, rev, revtype) VALUES (")
+            .append("(select id from model_ensemble_type where name = '")
+            .append(ensembleType)
+            .append("'),")
+            .append(rev)
+            .append(",0);\n");
+        rev++;
       }
       for (String familyType : familyTypes) {
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
         sb.append("INSERT INTO model_family_type(name) VALUES ('")
             .append(familyType)
             .append("');\n");
+        sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+            .append(rev)
+            .append(",'")
+            .append(timeStamp)
+            .append("');\n");
+        sb.append("INSERT INTO model_family_type_aud(id, rev, revtype) VALUES (")
+            .append("(select id from model_family_type where name = '")
+            .append(familyType)
+            .append("'),")
+            .append(rev)
+            .append(",0);\n");
+        rev++;
       }
     } catch (IOException e) {
       logger.error("Error reading ensemble-family.json file: " + e.getMessage(), e);
@@ -197,7 +285,20 @@ public class InsertStaticTables {
     List<String> groups = Arrays.asList(groupsProperty.split(","));
 
     for (String group : groups) {
+      String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
       sb.append("INSERT INTO model_group_type(name) VALUES ('").append(group).append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO model_group_type_aud(id, rev, revtype) VALUES (")
+          .append("(select id from model_group_type where name = '")
+          .append(group)
+          .append("'),")
+          .append(rev)
+          .append(",0);\n");
+      rev++;
     }
     return sb.toString();
   }
@@ -209,7 +310,20 @@ public class InsertStaticTables {
     List<String> parameterTypes = Arrays.asList(parameterTypesProperty.split(","));
 
     for (String parameterType : parameterTypes) {
+      String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
       sb.append("INSERT INTO parameter_type(name) VALUES ('").append(parameterType).append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO parameter_type_aud(id, rev, revtype) VALUES (")
+          .append("(select id from parameter_type where name = '")
+          .append(parameterType)
+          .append("'),")
+          .append(rev)
+          .append(",0);\n");
+      rev++;
     }
     return sb.toString();
   }
@@ -221,10 +335,27 @@ public class InsertStaticTables {
     List<String> distributionTypes = Arrays.asList(distributionProperty.split(","));
 
     for (String distributionType : distributionTypes) {
+      String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
       sb.append("INSERT INTO parameter_distribution_type(name) VALUES ('")
           .append(distributionType)
           .append("');\n");
+      sb.append("INSERT INTO revinfo(rev,revtstmp) VALUES (")
+          .append(rev)
+          .append(",'")
+          .append(timeStamp)
+          .append("');\n");
+      sb.append("INSERT INTO parameter_distribution_type_aud(id, rev, revtype) VALUES (")
+          .append("(select id from parameter_distribution_type where name = '")
+          .append(distributionType)
+          .append("'),")
+          .append(rev)
+          .append(",0);\n");
+      rev++;
     }
     return sb.toString();
+  }
+
+  public static int getRev() {
+    return rev++;
   }
 }

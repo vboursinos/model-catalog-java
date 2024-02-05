@@ -63,7 +63,8 @@ public class InsertDynamicTables {
       num = "13";
     }
     FileUtils.writeToFile(
-        Paths.get(SQL_DIR_PATH, String.format("%s-DML-insert_models_%s.sql",num, mltask)).toString(),
+        Paths.get(SQL_DIR_PATH, String.format("%s-DML-insert_models_%s.sql", num, mltask))
+            .toString(),
         sqlScript);
     logger.info(mltask + " sql file created successfully!");
   }
